@@ -1,5 +1,8 @@
-var Entity = function() 
+var lastEntityId = 0;
+var Entity = function(name) 
 {
+    this.name = name;
+    this.id = lastEntityId++;
     this.enabled = true;
     this.childs = [];
     this.components = [];
@@ -44,6 +47,11 @@ Entity.prototype.setLocalPosition = function(position)
     this.updateWorldMatrix();
 };
 
+Entity.prototype.getWorldPosition = function()
+{
+    return [this.worldMatrix[3], this.worldMatrix[7], this.worldMatrix[11]];
+};
+
 Entity.prototype.move = function(dx, dy, dz)
 {
     this.localMatrix[3] += dx;
@@ -59,6 +67,12 @@ Entity.prototype.setLocalEulerRotation = function(rx, ry, rz)
         for(var j = 0; j < 3; j++)
             this.localMatrix[(i*4)+j] = rotationMatrix[(i*4)+j];
     this.updateWorldMatrix();
+};
+
+Entity.prototype.getWorldEulerRotation = function()
+{
+    //FIXME: Implement this
+    return [0,0,0];
 };
 
 Entity.prototype.rotate = function(rotation)
