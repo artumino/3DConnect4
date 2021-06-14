@@ -1,7 +1,8 @@
 var sceneRoot = new Entity();
-var gameEntity = new Entity();
+var gameEntity = new Mesh();
 
 gameEntity.setParent(sceneRoot);
+gameEntity.loadObj("assets/base.obj");
 gameEntity.addComponent({
     enabled: true,
     update: function(object, deltaTime)
@@ -13,6 +14,8 @@ gameEntity.addComponent({
     }
 });
 sceneRoot.setLocalEulerRotation(45,45,10);
+
+
 
 setInterval(function(){
     sceneRoot.update(1);
