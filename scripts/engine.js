@@ -49,7 +49,7 @@ GameEngine.prototype.main = function()
 GameEngine.prototype.update = function(time)
 {
     var newTime = time*0.001;
-    this.deltaTime = this.time - newTime;
+    this.deltaTime = newTime - this.time;
     this.time = newTime;
 
     gl.clearColor(0, 0, 0, 1.0);
@@ -131,59 +131,6 @@ window.onload = engine.init();
 
 engine.onInit = function()
 {
-    var mainScene = new Scene();
-
-    var cameraPivot = new Entity("CameraPivot");
-    var mainCamera = new Camera("Main Camera");
-    mainCamera.setParent(cameraPivot);
-    mainCamera.move(0, 12, -20);
-    mainCamera.setLocalEulerRotation(0, -30, 0);
-    var gameBoard = new DrawableEntity("GameBoard", {
-        mainTexture: new Texture("WoodM1.jpg")
-    }, meshLoader.base, Shader.getShader("ubershader"));
-
-    var pawn1 = new DrawableEntity("Pawn1", {
-        mainTexture: new Texture("WoodD1.jpg")
-    }, meshLoader.piece, Shader.getShader("ubershader"));
-    pawn1.setParent(gameBoard);
-    pawn1.setLocalPosition(1, 2, 1);
-
-    var pawn2 = new DrawableEntity("Pawn2", {
-        mainTexture: new Texture("WoodL1.png")
-    }, meshLoader.piece, Shader.getShader("ubershader"));
-    pawn2.setParent(gameBoard);
-    pawn2.setLocalPosition(1, 3, 1);
-
-    mainScene.addEntity(cameraPivot);
-    mainScene.addEntity(mainCamera);
-    mainScene.addEntity(gameBoard);
-    mainScene.addEntity(pawn1);
-    mainScene.addEntity(pawn2);
-
-    cameraPivot.addComponent({
-        enabled: true,
-        update: function(object, deltaTime)
-        {
-            object.rotate(Quaternion.fromEuler(0, 0, 1*deltaTime, 'XZY'));
-        }
-    });
-
-    pawn1.addComponent({
-        enabled: true,
-        update: function(object, deltaTime)
-        {
-            object.setLocalPosition(1,2+Math.cos(engine.time*5),1);
-        }
-    });
-
-    pawn2.addComponent({
-        enabled: true,
-        update: function(object, deltaTime)
-        {
-            object.setLocalPosition(1,3+Math.cos(engine.time*5),1);
-        }
-    });
-
-    mainScene.init();
-    engine.loadScene(mainScene);
+    var gameManager = new Connect4Manager(engine);
+    gameManager.resetGame();
 }

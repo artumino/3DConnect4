@@ -24,3 +24,14 @@ var Texture = function(name)
         gl.generateMipmap(gl.TEXTURE_2D);
     };
 }
+
+var textureCache = {};
+Texture.getOrCreate = function(name)
+{
+    if(textureCache[name])
+        return textureCache[name];
+    else
+    {
+        return (textureCache[name] = new Texture(name));
+    }
+}
