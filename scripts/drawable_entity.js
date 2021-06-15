@@ -5,7 +5,7 @@ var DrawableEntity = function(name, material, mesh, shader)
     this.shader = shader;
     this.material = material;
     this.drawInfo = {
-        bufferLenght: this.mesh.bufferLength,
+        bufferLength: this.mesh.bufferLength,
         vertexArray: this.mesh.vertexArray
     };
 }
@@ -14,7 +14,7 @@ DrawableEntity.prototype = Object.create(Entity.prototype);
 
 DrawableEntity.prototype.init = function()
 {
-    this.drawInfo.bufferLenght = this.mesh.indices.length;
+    this.drawInfo.bufferLength = this.mesh.indices.length;
     this.drawInfo.vertexArray = this.mesh.getVAO(this.shader);
 }
 

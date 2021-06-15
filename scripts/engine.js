@@ -10,6 +10,7 @@ var GameEngine = function() {
     this.cameraMatrix = [];
     this.viewMatrix = [];
     this.viewProjectionMatrix = [];
+    this.time = 0;
     this.onInit = undefined;
 };
 
@@ -45,9 +46,11 @@ GameEngine.prototype.main = function()
     requestAnimationFrame(this.update.bind(this));
 }
 
-GameEngine.prototype.update = function(deltaTime)
+GameEngine.prototype.update = function(time)
 {
-    deltaTime *= 0.001;
+    var newTime = time*0.001;
+    this.deltaTime = this.time - newTime;
+    this.time = newTime;
 
     gl.clearColor(0, 0, 0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -63,13 +66,12 @@ GameEngine.prototype.update = function(deltaTime)
                                                         activeCamera.farPlane);
     
         // Compute the camera matrix using look at.
-        this.cameraMatrix = utils.MakeView(activeCamera.getWorldPosition(), activeCamera.getWorldEulerRotation());
-        this.viewMatrix = utils.invertMatrix(this.cameraMatrix);
+        this.viewMatrix = utils.invertMatrix(activeCamera.worldMatrix);
     
         this.viewProjectionMatrix = utils.multiplyMatrices(this.projectionMatrix, this.viewMatrix);
     
         //Game Logic Update
-        this.currentScene.sceneRoot.update(deltaTime);
+        this.currentScene.sceneRoot.update(this.deltaTime);
 
         //Draw
         Object.values(this.currentScene.objects).forEach(sceneObject => {
@@ -78,7 +80,7 @@ GameEngine.prototype.update = function(deltaTime)
                 var shader = sceneObject.shader;
 
                 if(shader.params["matrix_MVP"])
-                    gl.uniformMatrix4fv(shader.params["matrix_MVP"], gl.FALSE, utils.multiplyMatrices(this.viewProjectionMatrix, sceneObject.worldMatrix));
+                    gl.uniformMatrix4fv(shader.params["matrix_MVP"], gl.FALSE, utils.transposeMatrix(utils.multiplyMatrices(this.viewProjectionMatrix, sceneObject.worldMatrix)));
                 
                 if(shader.params["matrix_N"])
                     gl.uniformMatrix4fv(shader.params["matrix_N"], gl.FALSE, utils.transposeMatrix(utils.invertMatrix(utils.transposeMatrix(sceneObject.worldMatrix))));
@@ -109,7 +111,7 @@ GameEngine.prototype.update = function(deltaTime)
                             gl.uniform1fv(paramLocation, value);
                     }
                 });
-
+                
                 gl.bindVertexArray(sceneObject.drawInfo.vertexArray);
                 gl.drawElements(gl.TRIANGLES, sceneObject.drawInfo.bufferLength, gl.UNSIGNED_SHORT, 0 );
             }
@@ -134,9 +136,8 @@ engine.onInit = function()
     var cameraPivot = new Entity("CameraPivot");
     var mainCamera = new Camera("Main Camera");
     mainCamera.setParent(cameraPivot);
-    mainCamera.move(0, 0, -10);
-    //mainCamera.setLocalEulerRotation(-45, 0, 0);
-
+    mainCamera.move(0, 5, -10);
+    mainCamera.setLocalEulerRotation(0, -30, 0);
     var gameBoard = new DrawableEntity("GameBoard", {
         mainTexture: new Texture("WoodM1.jpg")
     }, meshLoader.base, Shader.getShader("ubershader"));
@@ -144,6 +145,14 @@ engine.onInit = function()
     mainScene.addEntity(cameraPivot);
     mainScene.addEntity(mainCamera);
     mainScene.addEntity(gameBoard);
+
+    cameraPivot.addComponent({
+        enabled: true,
+        update: function(object, deltaTime)
+        {
+            object.rotate(Quaternion.fromEuler(0, 0, 1*deltaTime, 'XZY'));
+        }
+    })
 
     mainScene.init();
     engine.loadScene(mainScene);

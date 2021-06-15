@@ -9,6 +9,8 @@ var Entity = function(name)
     this.parent = undefined;
     this.worldMatrix = utils.identityMatrix();
     this.localMatrix = utils.identityMatrix();
+    this.localPosition = [0,0,0];
+    this.localRotation = new Quaternion();
 };
 
 /*
@@ -34,16 +36,11 @@ Entity.prototype.removeChild = function(child)
     }
 }
 
-Entity.prototype.getLocalPosition = function()
+Entity.prototype.setLocalPosition = function(x, y, z)
 {
-    return [this.localMatrix[3], this.localMatrix[7], this.localMatrix[11]];
-};
-
-Entity.prototype.setLocalPosition = function(position)
-{
-    this.localMatrix[3] = position[0];
-    this.localMatrix[7] = position[1];
-    this.localMatrix[11] = position[2];
+    this.localPosition[0] = x;
+    this.localPosition[1] = y;
+    this.localPosition[2] = z;
     this.updateWorldMatrix();
 };
 
@@ -54,40 +51,41 @@ Entity.prototype.getWorldPosition = function()
 
 Entity.prototype.move = function(dx, dy, dz)
 {
-    this.localMatrix[3] += dx;
-    this.localMatrix[7] += dy;
-    this.localMatrix[11] += dz;
+    this.localPosition[0] += dx;
+    this.localPosition[1] += dy;
+    this.localPosition[2] += dz;
     this.updateWorldMatrix();
 };
 
 Entity.prototype.setLocalEulerRotation = function(rx, ry, rz)
 {
-    var rotationMatrix = utils.MakeRotateXYZMatrix(rx, ry, rz, 1);
-    for(var i = 0; i < 3; i++)
-        for(var j = 0; j < 3; j++)
-            this.localMatrix[(i*4)+j] = rotationMatrix[(i*4)+j];
+    this.localRotation = Quaternion.fromEuler(utils.degToRad(rx), utils.degToRad(ry), utils.degToRad(rz), 'XYZ');
     this.updateWorldMatrix();
 };
 
-Entity.prototype.getWorldEulerRotation = function()
+Entity.prototype.rotateEuler = function(rx, ry, rz)
 {
-    //FIXME: Implement this
-    return [0,0,0];
+    let rotation = Quaternion.fromEuler(utils.degToRad(rx), utils.degToRad(ry), utils.degToRad(rz), 'XYZ');
+    this.rotate(rotation);
 };
 
 Entity.prototype.rotate = function(rotation)
 {
-    let rotationMatrix = rotation.toMatrix4();
-    this.localMatrix = utils.multiplyMatrices(this.localMatrix, rotationMatrix);
-    this.updateWorldPosition();
+    this.localRotation = this.localRotation.mul(rotation);
+    this.updateWorldMatrix();
 };
 
 Entity.prototype.updateWorldMatrix = function()
 {
+    let T = utils.MakeTranslateMatrix(this.localPosition[0], this.localPosition[1], -this.localPosition[2]);
+    let R = this.localRotation.toMatrix4();
+
+    this.localMatrix = utils.multiplyMatrices(T, R);
+
     if(this.parent != undefined)
         this.worldMatrix = utils.multiplyMatrices(this.parent.worldMatrix, this.localMatrix);
     else
-        this.worldMatrix = this.localMatrix;
+        utils.copy(this.localMatrix, this.worldMatrix);
 
     this.childs.forEach(child => {
         child.updateWorldMatrix();
