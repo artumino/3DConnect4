@@ -1,7 +1,7 @@
 var Camera = function(name)
 {
     Entity.call(this, name);
-    this.fov = 90.0;
+    this.fov = 60.0;
     this.nearPlane = 1.0;
     this.farPlane = 2000.0;
 }
