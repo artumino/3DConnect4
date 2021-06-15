@@ -36,7 +36,7 @@ Connect4Manager.prototype.reloadScene = function()
     mainCamera.move(0, 12, -20);
     mainCamera.setLocalEulerRotation(0, -30, 0);
     this.gameBoard = new DrawableEntity("GameBoard", {
-        mainTexture: new Texture("WoodM1.jpg")
+        mainTexture: Texture.getOrCreate("WoodM1.jpg")
     }, meshLoader.base, Shader.getShader("ubershader"));
 
     this.gameScene.addEntity(cameraPivot);
