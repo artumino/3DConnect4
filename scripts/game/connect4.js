@@ -106,7 +106,8 @@ Connect4Manager.prototype.dropPiece = function(player, row, column)
         pawn.setParent(this.gameBoard);
         pawn.setLocalPosition(startPosition[0], startPosition[1], startPosition[2]);
 
-        let pawnLerper = {
+        //Add falling animation
+        pawn.addComponent({
             enabled: true,
             time: 0.0,
             duration: 1.0,
@@ -121,11 +122,11 @@ Connect4Manager.prototype.dropPiece = function(player, row, column)
                 if(interpolationFactor == 1)
                 {
                     this.enabled = false;
-                    object.removeComponent(pawnLerper);
+                    object.removeComponent(this);
                 }
             }
-        };
-        pawn.addComponent(pawnLerper);
+        });
+
         pawn.init();
         this.gameScene.addEntity(pawn);
         return true;
