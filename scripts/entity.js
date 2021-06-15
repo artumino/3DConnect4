@@ -100,6 +100,13 @@ Entity.prototype.addComponent = function(component)
     this.components.push(component);
 };
 
+Entity.prototype.removeComponent = function(component)
+{
+    let indexOfComponent = this.components.indexOf(component);
+    if(indexOfComponent >= 0)
+        this.components.splice(indexOfComponent, 1);
+};
+
 Entity.prototype.update = function(deltaTime)
 {
     if(this.enabled)
