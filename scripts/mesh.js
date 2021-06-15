@@ -20,4 +20,12 @@ Mesh.prototype.loadObj = function(filename)
     this.texels = objModel.textures;
 }
 
+Mesh.prototype.copyFrom = function(mesh)
+{
+    Object.assign(this.vertices, mesh.vertices);
+    Object.assign(this.normals, mesh.normals);
+    Object.assign(this.indices, mesh.indices);
+    Object.assign(this.texels, mesh.texels);
+}
+
 Object.defineProperty(Mesh.prototype, 'constructor', { value: Mesh, enumerable: false, writable: true});
