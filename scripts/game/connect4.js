@@ -57,19 +57,28 @@ Connect4Manager.prototype.reloadScene = function()
         time: 0.0,
         lastInsertion: [0, 0],
         player: 0,
+        terminated: false,
         update: function(object, deltaTime)
         {
             this.time += deltaTime;
-            if(this.time > 5)
+            if(this.time > 0.1)
             {
-                connectManager.dropPiece(this.player++ % 2, this.lastInsertion[0], this.lastInsertion[1]);
-                if(this.lastInsertion[1]++ % gameColumns == 0)
+                if(!this.terminated)
                 {
-                    this.lastInsertion[1] = 0;
-                    if(this.lastInsertion[0]++ % gameRows == 0)
-                        this.lastInsertion[0] = 0;
+                    this.player = Math.ceil(Math.random() * 1000);
+                    this.terminated = !connectManager.dropPiece(this.player % 2, this.lastInsertion[0], this.lastInsertion[1]);
+                    this.lastInsertion[1] += 1;
+                    if(this.lastInsertion[1] >= gameColumns)
+                    {
+                        this.lastInsertion[1] = 0;
+                        this.lastInsertion[0] += 1;
+                        if(this.lastInsertion[0] >= gameRows)
+                            this.lastInsertion[0] = 0;
+                    }
+                    this.time = 0;
                 }
-                this.time = 0;
+                else if(this.time > 5)
+                    connectManager.resetGame();
             }
         }
     });
@@ -80,16 +89,15 @@ Connect4Manager.prototype.reloadScene = function()
 
 Connect4Manager.prototype.dropPiece = function(player, row, column)
 {
-    console.log("Dropping " + player + " into " + row + "," + column);
     var designedStack = this.gameState[row][column];
     if(this.gameScene && designedStack && designedStack.length < gameMaxStack)
     {
         const depth = designedStack.push(player);
         const pawnBoardCoordinates = this.fromStateToBoardCoords(row, column, depth);
         const startPosition = [pawnBoardCoordinates[0], 10, pawnBoardCoordinates[2]];
-        const animationDelta = [startPosition[0] - pawnBoardCoordinates[0],
-                     startPosition[1] - pawnBoardCoordinates[1],
-                     startPosition[2] - pawnBoardCoordinates[2]]
+        const animationDelta = [pawnBoardCoordinates[0] - startPosition[0],
+                                pawnBoardCoordinates[1] - startPosition[1],
+                                pawnBoardCoordinates[2] - startPosition[2]]
 
 
         let pawn = new DrawableEntity("Pawn_" + row + "_" + column + "_" + depth, {
@@ -105,7 +113,7 @@ Connect4Manager.prototype.dropPiece = function(player, row, column)
             update: function(object, deltaTime)
             {
                 this.time += deltaTime;
-                let interpolationFactor = Math.min(0, Math.max(1, this.time / this.duration));
+                let interpolationFactor = Math.min(1, Math.max(0, this.time / this.duration));
                 object.setLocalPosition(startPosition[0] + animationDelta[0]*interpolationFactor,
                     startPosition[1] + animationDelta[1]*interpolationFactor,
                     startPosition[2] + animationDelta[2]*interpolationFactor);
@@ -120,12 +128,15 @@ Connect4Manager.prototype.dropPiece = function(player, row, column)
         pawn.addComponent(pawnLerper);
         pawn.init();
         this.gameScene.addEntity(pawn);
+        return true;
     }
+    
+    return false;
 }
 
 Connect4Manager.prototype.fromStateToBoardCoords = function(i, j, depth)
 {
-    return [-2 + i*1.5, 1 + depth*1.5,-2 + j*1.5]
+    return [-3 + i*2, depth*1,-3 + j*2]
 }
 
 Connect4Manager.prototype.processWinCondition = function()
