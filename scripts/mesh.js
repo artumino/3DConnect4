@@ -1,14 +1,10 @@
 var Mesh = function()
 {
-    Entity.call(this);
-
     this.vertices = [];
     this.normals = [];
     this.texels = [];
     this.indices = [];
 }
-
-Mesh.prototype = Object.create(Entity.prototype);
 
 Mesh.prototype.loadObj = function(filename)
 {
@@ -27,5 +23,3 @@ Mesh.prototype.copyFrom = function(mesh)
     Object.assign(this.indices, mesh.indices);
     Object.assign(this.texels, mesh.texels);
 }
-
-Object.defineProperty(Mesh.prototype, 'constructor', { value: Mesh, enumerable: false, writable: true});

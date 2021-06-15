@@ -6,15 +6,22 @@ var meshLoader = function()
     init = function() {
         base = Mesh();
         base.loadObj("assets/base.obj");
+
         piece = Mesh();
         piece.loadObj("assets/piece_fixed.obj");
     }
 
-    bindBase = function(mesh) {
-        mesh.copyFrom(base);
+    getClone = function(mesh) {
+        var clone = new Mesh();
+        clone.copyFrom(mesh);
+        return clone;
     }
 
-    bindPiece = function(mesh) {
-        mesh.copyFrom(piece);
+    getBaseClone = function() {
+        return getClone(base);
+    }
+
+    getPieceClone = function() {
+        return getClone(piece);
     }
 }
