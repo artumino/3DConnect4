@@ -176,6 +176,13 @@ Connect4Manager.prototype.dropPiece = function(player, row, column)
 
         pawn.init();
         this.gameScene.addEntity(pawn);
+
+        if(this.processWinCondition(player, row, column, depth-1))
+        {
+            console.log(player + " has won!");
+            return false;
+        }
+
         return true;
     }
     
@@ -187,7 +194,69 @@ Connect4Manager.prototype.fromStateToBoardCoords = function(i, j, depth)
     return [-3 + i*2, depth,-3 + j*2]
 }
 
-Connect4Manager.prototype.processWinCondition = function()
+Connect4Manager.prototype.processWinCondition = function(player, row, column, depth)
 {
+    const indexer = [row, column, depth];
+    const winningDirections = [
+        [1,0,0], //Row
+        [0,1,0], //Column
+        [0,0,1], //Depth
+        [1,1,0], //Horizontal Plane Diagonal1
+        [-1,1,0], //Horizontal Plane Diagonal2
+        [1,0,1], //Vertical Plane Diagonal1
+        [-1,0,1], //Vertical Plane Diagonal2
+        [0,1,1], //Vertical Plane Diagonal3
+        [0,-1,1], //Vertical Plane Diagonal4
+        [1,1,1], //Cube Diagonal1
+        [-1,-1,1], //Cube Diagonal2
+    ];
 
+    var that = this;
+    return winningDirections.some(winningDirection =>
+    {
+        return that.countInDirection(player, indexer, winningDirection) >= 4;
+    });
+}
+
+Connect4Manager.prototype.countInDirection = function(player, indexer, direction)
+{
+    if(this.indexState(indexer) != player)
+        return 0;
+
+    let count = 1;
+    const backDirection = [-direction[0], -direction[1], -direction[2]];
+
+    //Forward pass
+    for(let forwardIndex = this.iterateForward(indexer, direction);
+        this.indexState(forwardIndex) == player;
+        forwardIndex = this.iterateForward(forwardIndex, direction)) {
+        count++;
+    } 
+
+    //Backwards pass
+    for(let backIndex = this.iterateForward(indexer, backDirection);
+        this.indexState(backIndex) == player;
+        backIndex = this.iterateForward(backIndex, backDirection)) {
+        count++;
+    } 
+    
+    return count;
+}
+
+Connect4Manager.prototype.indexState = function(indexer)
+{
+    if(indexer[0] >= gameRows || indexer[0] < 0 || 
+        indexer[1] >= gameColumns || indexer[1] < 0 ||
+        indexer[2] >= gameMaxStack || indexer[2] < 0 )
+        return undefined;
+    return this.gameState[indexer[0]][indexer[1]][indexer[2]];
+}
+
+Connect4Manager.prototype.iterateForward = function(indexer, direction)
+{
+    let newIndexer = [indexer[0], indexer[1], indexer[2]]
+    newIndexer[0] += direction[0];
+    newIndexer[1] += direction[1];
+    newIndexer[2] += direction[2];
+    return newIndexer;
 }
