@@ -1,6 +1,27 @@
 const gameRows = 4;
 const gameColumns = 4;
 const gameMaxStack = 5;
+
+// Mouse camera movement
+var mouseStartPosition = null;
+var canvas = document.getElementById("canvas");
+var canvasSize = [ canvas.width, canvas.height ];
+
+var mouseMovement = function mousemove(e)
+{
+    if (!mouseStartPosition) return;
+    let delta = [ mouseStartPosition[0] - e.clientX, mouseStartPosition[1] - e.clientY ];
+    let degrees = [ delta[0] * 180 / canvasSize[0], delta[1] * 180 / canvasSize[1] ];
+    console.log(degrees);
+    engine.currentScene.sceneRoot.rotateEuler(degrees[0], degrees[1], 0);
+    mouseStartPosition = [ e.clientX, e.clientY ];
+};
+
+canvas.addEventListener("mousedown", function(e) { mouseStartPosition = [ e.clientX, e.clientY ]; }, false);
+canvas.addEventListener("mouseup", function() { mouseStartPosition = null; }, false);
+canvas.addEventListener("mousemove", mouseMovement, false);
+
+
 var Connect4Manager = function(gameEngine)
 {
     this.gameEngine = gameEngine;
@@ -28,6 +49,7 @@ Connect4Manager.prototype.resetGame = function()
 
 Connect4Manager.prototype.reloadScene = function()
 {
+    mouseStartPosition = null;
     this.gameScene  = new Scene();
 
     var cameraPivot = new Entity("CameraPivot");
