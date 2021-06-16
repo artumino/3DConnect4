@@ -35,8 +35,8 @@ Connect4Manager.prototype.reloadScene = function()
     var cameraPivot = new Entity("CameraPivot");
     var mainCamera = new Camera("Main Camera");
     mainCamera.setParent(cameraPivot);
-    mainCamera.move(0, 12, -20);
-    mainCamera.setLocalEulerRotation(0, -30, 0);
+    mainCamera.move(0, 0, -20);
+    //mainCamera.setLocalEulerRotation(0, -30, 0);
     this.gameBoard = new DrawableEntity("GameBoard", {
         mainTexture: Texture.getOrCreate("WoodM1.jpg")
     }, meshLoader.base, Shader.getShader("ubershader"));
@@ -46,6 +46,18 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameScene.addEntity(this.gameBoard);
 
     var inputManager = this.gameEngine.input;
+    cameraPivot.addComponent({
+        enabled: true,
+        update: function(object, deltaTime)
+        {
+            if(inputManager.isMouseDown)
+            {
+                let degrees = [ inputManager.mouseDelta[0] * 180 / gl.canvas.width, inputManager.mouseDelta[1] * 180 / gl.canvas.height ];
+                object.rotateEuler(0, -degrees[1], 0);
+            }
+        }
+    });
+
     this.gameBoard.addComponent({
         enabled: true,
         update: function(object, deltaTime)
@@ -53,7 +65,7 @@ Connect4Manager.prototype.reloadScene = function()
             if(inputManager.isMouseDown)
             {
                 let degrees = [ inputManager.mouseDelta[0] * 180 / gl.canvas.width, inputManager.mouseDelta[1] * 180 / gl.canvas.height ];
-                object.rotateEuler(0, degrees[1], degrees[0]);
+                object.rotateEuler(0, 0, degrees[0]);
             }
         }
     });
