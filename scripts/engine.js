@@ -12,6 +12,7 @@ var GameEngine = function() {
     this.viewProjectionMatrix = [];
     this.time = 0;
     this.onInit = undefined;
+    this.input = undefined;
 };
 
 GameEngine.prototype.init = async function()
@@ -24,6 +25,9 @@ GameEngine.prototype.init = async function()
     }
 
     utils.resizeCanvasToDisplaySize(gl.canvas);
+    this.input = new Input(canvas);
+    this.input.init();
+
     this.uberShader = Shader.getShader("ubershader");
     await this.uberShader.loader;
 
@@ -117,6 +121,9 @@ GameEngine.prototype.update = function(time)
             }
         });
     }
+
+    //Late Input Update
+    this.input.update();
 
     requestAnimationFrame(this.update.bind(this));
 }

@@ -10,7 +10,7 @@ var Entity = function(name)
     this.worldMatrix = utils.identityMatrix();
     this.localMatrix = utils.identityMatrix();
     this.localPosition = [0,0,0];
-    this.localRotation = new Quaternion();
+    this.localRotation = Quaternion.ONE;
 };
 
 /*
@@ -59,19 +59,19 @@ Entity.prototype.move = function(dx, dy, dz)
 
 Entity.prototype.setLocalEulerRotation = function(rx, ry, rz)
 {
-    this.localRotation = Quaternion.fromEuler(utils.degToRad(rx), utils.degToRad(ry), utils.degToRad(rz), 'XYZ');
+    this.localRotation = Quaternion.fromEuler(utils.degToRad(rx), utils.degToRad(ry), utils.degToRad(rz), order="ZXY");
     this.updateWorldMatrix();
 };
 
 Entity.prototype.rotateEuler = function(rx, ry, rz)
 {
-    let rotation = Quaternion.fromEuler(utils.degToRad(rx), utils.degToRad(ry), utils.degToRad(rz), 'XYZ');
+    let rotation = Quaternion.fromEuler(utils.degToRad(rx), utils.degToRad(ry), utils.degToRad(rz), order="ZXY");
     this.rotate(rotation);
 };
 
 Entity.prototype.rotate = function(rotation)
 {
-    this.localRotation = this.localRotation.mul(rotation);
+    this.localRotation = rotation.mul(this.localRotation);
     this.updateWorldMatrix();
 };
 
