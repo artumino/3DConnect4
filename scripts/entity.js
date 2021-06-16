@@ -107,6 +107,12 @@ Entity.prototype.removeComponent = function(component)
         this.components.splice(indexOfComponent, 1);
 };
 
+Entity.prototype.destroy = function()
+{
+    for(component in this.components)
+        if(component.destroy) component.destroy();
+}
+
 Entity.prototype.update = function(deltaTime)
 {
     if(this.enabled)
