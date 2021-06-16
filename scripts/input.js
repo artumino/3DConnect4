@@ -16,6 +16,7 @@ Input.prototype.init = function()
 
 Input.prototype.update = function()
 {
+    this.mouseDelta = [0,0];
     this.lastMousePosition = this.mousePosition;
 }
 
