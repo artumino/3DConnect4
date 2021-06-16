@@ -33,17 +33,28 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameScene  = new Scene();
 
     var cameraPivot = new Entity("CameraPivot");
+
+    var cameraGimbal = new Entity("CameraGimbal");
+    cameraGimbal.setLocalEulerRotation(0, -30, 0);
+    cameraGimbal.setParent(cameraPivot);
+
     var mainCamera = new Camera("Main Camera");
-    mainCamera.setParent(cameraPivot);
+    mainCamera.setParent(cameraGimbal);
     mainCamera.move(0, 0, -20);
-    //mainCamera.setLocalEulerRotation(0, -30, 0);
+    
     this.gameBoard = new DrawableEntity("GameBoard", {
         mainTexture: Texture.getOrCreate("WoodM1.jpg")
     }, meshLoader.base, Shader.getShader("ubershader"));
+    this.gameBoard.move(0, -2, 0);
+
+    var skyBox = new Skybox("Skybox", {
+        mainTexture: Cubemap.getOrCreate("skybox/beach")
+    }, Shader.getShader("skybox"));
 
     this.gameScene.addEntity(cameraPivot);
     this.gameScene.addEntity(mainCamera);
     this.gameScene.addEntity(this.gameBoard);
+    this.gameScene.addEntity(skyBox);
 
     var inputManager = this.gameEngine.input;
     cameraPivot.addComponent({
@@ -54,25 +65,34 @@ Connect4Manager.prototype.reloadScene = function()
             {
                 // Camera rotation
                 let degrees = [ inputManager.mouseDelta[0] * 180 / gl.canvas.width, inputManager.mouseDelta[1] * 180 / gl.canvas.height ];
-                object.rotateEuler(0, -degrees[1], 0);
-
-                // Camera translation
-                let distance = inputManager.scroll * 10;
-                let centerDirection = computeVersor(mainCamera.localPosition, object.localPosition);
-                mainCamera.move(centerDirection[0] * distance, centerDirection[1] * distance, centerDirection[2] * distance);
-                debugger;
+                object.rotateEuler(0, 0, -degrees[0]);
+            }
+            
+            // Camera translation
+            let movement = -inputManager.scroll * 0.5 * deltaTime;
+            if(movement != 0)
+            {
+                let finalPosition = mainCamera.predictMove(0, 0, movement);
+                const threshold = -3;
+                const maxDistance = -20;
+                if (finalPosition[2] > threshold)
+                    mainCamera.setLocalPosition(0, 0, threshold);
+                else if(finalPosition[2] < maxDistance)
+                    mainCamera.setLocalPosition(0, 0, maxDistance);
+                else
+                    mainCamera.move(0, 0, movement);
             }
         }
     });
 
-    this.gameBoard.addComponent({
+    cameraGimbal.addComponent({
         enabled: true,
         update: function(object, deltaTime)
         {
             if(inputManager.isMouseDown)
             {
                 let degrees = [ inputManager.mouseDelta[0] * 180 / gl.canvas.width, inputManager.mouseDelta[1] * 180 / gl.canvas.height ];
-                object.rotateEuler(0, 0, degrees[0]);
+                object.rotateEuler(0, -degrees[1], 0);
             }
         }
     });
@@ -163,7 +183,7 @@ Connect4Manager.prototype.dropPiece = function(player, row, column)
 
 Connect4Manager.prototype.fromStateToBoardCoords = function(i, j, depth)
 {
-    return [-3 + i*2, depth*1,-3 + j*2]
+    return [-3 + i*2, depth,-3 + j*2]
 }
 
 Connect4Manager.prototype.processWinCondition = function()

@@ -4,18 +4,20 @@ var DrawableEntity = function(name, material, mesh, shader)
     this.mesh = mesh;
     this.shader = shader;
     this.material = material;
-    this.drawInfo = {
-        bufferLength: this.mesh.bufferLength,
-        vertexArray: this.mesh.vertexArray
-    };
+    this.vao = undefined;
 }
 
 DrawableEntity.prototype = Object.create(Entity.prototype);
 
 DrawableEntity.prototype.init = function()
 {
-    this.drawInfo.bufferLength = this.mesh.indices.length;
-    this.drawInfo.vertexArray = this.mesh.getVAO(this.shader);
+    this.vao = this.mesh.getVAO(this.shader);
+}
+
+DrawableEntity.prototype.draw = function()
+{
+    gl.bindVertexArray(this.vao);
+    gl.drawElements(gl.TRIANGLES, this.mesh.indices.length, gl.UNSIGNED_SHORT, 0 );
 }
 
 Object.defineProperty(DrawableEntity.prototype, 'constructor', { value: DrawableEntity, enumerable: false, writable: true});

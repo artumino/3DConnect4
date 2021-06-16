@@ -10,6 +10,7 @@ var GameEngine = function() {
     this.cameraMatrix = [];
     this.viewMatrix = [];
     this.viewProjectionMatrix = [];
+    this.inverseViewProjectionMatrix = [];
     this.time = 0;
     this.onInit = undefined;
     this.input = undefined;
@@ -73,18 +74,23 @@ GameEngine.prototype.update = function(time)
         this.viewMatrix = utils.invertMatrix(activeCamera.worldMatrix);
     
         this.viewProjectionMatrix = utils.multiplyMatrices(this.projectionMatrix, this.viewMatrix);
+        this.inverseViewProjectionMatrix = utils.invertMatrix(this.viewProjectionMatrix);
     
         //Game Logic Update
         this.currentScene.sceneRoot.update(this.deltaTime);
 
         //Draw
         Object.values(this.currentScene.objects).forEach(sceneObject => {
-            if(sceneObject instanceof DrawableEntity)
+            if(sceneObject.draw)
             {
                 var shader = sceneObject.shader;
+                gl.useProgram(shader.program);
 
                 if(shader.params["matrix_MVP"])
                     gl.uniformMatrix4fv(shader.params["matrix_MVP"], gl.FALSE, utils.transposeMatrix(utils.multiplyMatrices(this.viewProjectionMatrix, sceneObject.worldMatrix)));
+
+                if(shader.params["imatrix_VP"])
+                    gl.uniformMatrix4fv(shader.params["imatrix_VP"], gl.FALSE, utils.transposeMatrix(this.inverseViewProjectionMatrix));
                 
                 if(shader.params["matrix_N"])
                     gl.uniformMatrix4fv(shader.params["matrix_N"], gl.FALSE, utils.transposeMatrix(utils.invertMatrix(utils.transposeMatrix(sceneObject.worldMatrix))));
@@ -111,13 +117,18 @@ GameEngine.prototype.update = function(time)
                             gl.bindTexture(gl.TEXTURE_2D, value.handle);
                             gl.uniform1i(paramLocation, 0);
                         }
+                        else if(value instanceof Cubemap)
+                        {
+                            gl.activeTexture(gl.TEXTURE0+3);
+                            gl.bindTexture(gl.TEXTURE_CUBE_MAP, value.handle);
+                            gl.uniform1i(paramLocation, 3);
+                        }
                         else
                             gl.uniform1fv(paramLocation, value);
                     }
                 });
                 
-                gl.bindVertexArray(sceneObject.drawInfo.vertexArray);
-                gl.drawElements(gl.TRIANGLES, sceneObject.drawInfo.bufferLength, gl.UNSIGNED_SHORT, 0 );
+                sceneObject.draw();
             }
         });
     }

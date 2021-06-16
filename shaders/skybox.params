@@ -1,0 +1,10 @@
+{
+    "uniforms" : [
+        "imatrix_VP",
+        "mainTexture"
+    ],
+    
+    "attributes" : [
+        "inPosition0"
+    ]
+}
