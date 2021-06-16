@@ -52,8 +52,15 @@ Connect4Manager.prototype.reloadScene = function()
         {
             if(inputManager.isMouseDown)
             {
+                // Camera rotation
                 let degrees = [ inputManager.mouseDelta[0] * 180 / gl.canvas.width, inputManager.mouseDelta[1] * 180 / gl.canvas.height ];
                 object.rotateEuler(0, -degrees[1], 0);
+
+                // Camera translation
+                let distance = inputManager.scroll * 10;
+                let centerDirection = computeVersor(mainCamera.localPosition, object.localPosition);
+                mainCamera.move(centerDirection[0] * distance, centerDirection[1] * distance, centerDirection[2] * distance);
+                debugger;
             }
         }
     });

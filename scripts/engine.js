@@ -123,7 +123,7 @@ GameEngine.prototype.update = function(time)
     }
 
     //Late Input Update
-    this.input.update();
+    this.input.lateUpdate();
 
     requestAnimationFrame(this.update.bind(this));
 }
