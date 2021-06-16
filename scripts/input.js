@@ -43,5 +43,4 @@ Input.prototype.OnMouseMove = function(e)
 Input.prototype.OnWheelScroll = function(e)
 {
     this.scroll = e.deltaY;
-    console.log(this.scroll);
 }

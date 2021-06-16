@@ -1,7 +1,8 @@
 {
     "uniforms" : [
         "imatrix_VP",
-        "mainTexture"
+        "mainTexture",
+        "blurFactor"
     ],
     
     "attributes" : [

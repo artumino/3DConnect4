@@ -48,6 +48,7 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameBoard.move(0, -2, 0);
 
     var skyBox = new Skybox("Skybox", {
+        blurFactor: 2,
         mainTexture: Cubemap.getOrCreate("skybox/beach")
     }, Shader.getShader("skybox"));
 

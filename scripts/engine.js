@@ -123,8 +123,10 @@ GameEngine.prototype.update = function(time)
                             gl.bindTexture(gl.TEXTURE_CUBE_MAP, value.handle);
                             gl.uniform1i(paramLocation, 3);
                         }
+                        else if(Number.isInteger(value))
+                            gl.uniform1i(paramLocation, value);
                         else
-                            gl.uniform1fv(paramLocation, value);
+                            gl.uniform1f(paramLocation, value);
                     }
                 });
                 
