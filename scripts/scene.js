@@ -4,6 +4,7 @@ var Scene = function()
     this.sceneRoot = new Entity("Root");
     this.objects[this.sceneRoot.id] = this.sceneRoot;
     this.activeCamera = undefined;
+    this.destroyed = false;
 }
 
 Scene.prototype.addEntity = function(entity)
@@ -23,5 +24,13 @@ Scene.prototype.init = function()
 {
     Object.values(this.objects).forEach(object => {
         if(object.init) object.init();
-    })
+    });
+}
+
+Scene.prototype.destroy = function()
+{
+    Object.values(this.objects).forEach(object => {
+        if(object.destroy) object.destroy();
+    });
+    this.destroyed = true;
 }

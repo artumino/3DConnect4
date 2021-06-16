@@ -123,7 +123,14 @@ GameEngine.prototype.update = function(time)
 
 GameEngine.prototype.loadScene = function(scene)
 {
-    this.currentScene = scene;
+    if(!scene.destroyed)
+    {
+        if(this.currentScene)
+            this.currentScene.destroy();
+        this.currentScene = scene;
+    }
+    else
+        console.error("Cannot reload a destroyed scene!");
 }
 
 var engine = new GameEngine();
