@@ -146,7 +146,8 @@ GameEngine.prototype.update = function(time)
 
 GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverride)
 {
-    var shader = shaderOverride || sceneObject.shader;
+    let shader = shaderOverride || sceneObject.shader;
+    let originalShader = sceneObject.shader;
     if(shader)
     {
         gl.useProgram(shader.program);
@@ -164,42 +165,47 @@ GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverrid
             gl.uniform4fv(shader.params["entityID"], sceneObject.encodedEntityID);
 
         //Setup Material Properties
-        Object.entries(sceneObject.material).forEach(param => {
-            let key = param[0];
-            let value = param[1];
-            let paramLocation = shader.params[key];
+        if(sceneObject.material)
+        {
+            Object.entries(sceneObject.material).forEach(param => {
+                let key = param[0];
+                let value = param[1];
+                let paramLocation = shader.params[key];
+    
+                if(paramLocation)
+                {
+                    if(Array.isArray(value))
+                    {
+                        if(value.length == 2)
+                            gl.uniform2fv(paramLocation, value);
+                        else if(value.length == 3)
+                            gl.uniform3fv(paramLocation, value);
+                        else if(value.length == 4)
+                            gl.uniform4fv(paramLocation, value);
+                    }
+                    else if(value instanceof Texture)
+                    {
+                        gl.activeTexture(gl.TEXTURE0);
+                        gl.bindTexture(gl.TEXTURE_2D, value.handle);
+                        gl.uniform1i(paramLocation, 0);
+                    }
+                    else if(value instanceof Cubemap)
+                    {
+                        gl.activeTexture(gl.TEXTURE0+3);
+                        gl.bindTexture(gl.TEXTURE_CUBE_MAP, value.handle);
+                        gl.uniform1i(paramLocation, 3);
+                    }
+                    else if(Number.isInteger(value))
+                        gl.uniform1i(paramLocation, value);
+                    else
+                        gl.uniform1f(paramLocation, value);
+                }
+            });
+        }
 
-            if(paramLocation)
-            {
-                if(Array.isArray(value))
-                {
-                    if(value.length == 2)
-                        gl.uniform2fv(paramLocation, value);
-                    else if(value.length == 3)
-                        gl.uniform3fv(paramLocation, value);
-                    else if(value.length == 4)
-                        gl.uniform4fv(paramLocation, value);
-                }
-                else if(value instanceof Texture)
-                {
-                    gl.activeTexture(gl.TEXTURE0);
-                    gl.bindTexture(gl.TEXTURE_2D, value.handle);
-                    gl.uniform1i(paramLocation, 0);
-                }
-                else if(value instanceof Cubemap)
-                {
-                    gl.activeTexture(gl.TEXTURE0+3);
-                    gl.bindTexture(gl.TEXTURE_CUBE_MAP, value.handle);
-                    gl.uniform1i(paramLocation, 3);
-                }
-                else if(Number.isInteger(value))
-                    gl.uniform1i(paramLocation, value);
-                else
-                    gl.uniform1f(paramLocation, value);
-            }
-        });
-        
+        if(originalShader != shader) sceneObject.shader = shader;
         sceneObject.draw();
+        if(originalShader != shader) sceneObject.shader = originalShader;
     }
 }
 

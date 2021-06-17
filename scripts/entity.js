@@ -144,6 +144,9 @@ Entity.prototype.update = function(deltaTime)
     }
 }
 
+/*
+    Entity Input Events
+*/
 Entity.prototype.processClick = function()
 {
     if(this.clickable)
@@ -153,7 +156,33 @@ Entity.prototype.processClick = function()
             {
                 component.onClick(this);
             }
-        }).bind(this);
+        });
+    }
+};
+
+Entity.prototype.processMouseEnter = function()
+{
+    if(this.clickable)
+    {
+        this.components.forEach(component => {
+            if(component.enabled && component.onMouseEnter)
+            {
+                component.onMouseEnter(this);
+            }
+        });
+    }
+};
+
+Entity.prototype.processMouseExit = function()
+{
+    if(this.clickable)
+    {
+        this.components.forEach(component => {
+            if(component.enabled && component.onMouseExit)
+            {
+                component.onMouseExit(this);
+            }
+        });
     }
 };
 

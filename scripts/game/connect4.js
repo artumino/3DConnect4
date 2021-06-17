@@ -5,6 +5,7 @@ const gameMaxStack = 5;
 var Connect4Manager = function(gameEngine)
 {
     this.gameEngine = gameEngine;
+    this.currentPlayer = 0;
     this.gameScene = undefined;
     this.gameBoard = undefined;
     this.gameState = undefined;
@@ -60,32 +61,29 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameScene.addEntity(skyBox);
 
     //Pawn Drop Selectors
-    //for(let i = 0; i < gameRows; i++)
-    //{
-    //    for(let j = 0; i < gameColumns; j++)
-    //    {
-    //        let pawnDropSelector = new DrawableEntity("PawnSelector_" + i + "_" + j, 
-    //                                                  undefined,
-    //                                                  meshLoader.pawnSelector,
-    //                                                  undefined);
-    //        pawnDropSelector.setParent(this.gameBoard);
-    //        pawnDropSelector.clickable = true;
-    //        pawnDropSelector.addComponent({
-    //            enabled: true,
-    //            onClick: function(object)
-    //            {
-    //                if(connectManager.dropPiece(connectManager.player, i, j))
-    //                {
-    //                    setTimeout(function () {
-    //                        connectManager.resetGame();
-    //                    }, 5000);
-    //                }
-    //            }
-    //            //TODO: Maybe highlight on mouse enter/exit?
-    //        });
-    //        this.gameScene.addEntity(pawnDropSelector);
-    //    }
-    //}
+    for(let i = 0; i < gameRows; i++)
+    {
+        for(let j = 0; j < gameColumns; j++)
+        {
+            let position = this.fromStateToBoardCoords(i, j, 0);
+            let pawnDropSelector = new DrawableEntity("PawnDropSelector_" + i + "_" + j, 
+                                                      undefined,
+                                                      meshLoader.pawnDropSelector,
+                                                      undefined);
+            pawnDropSelector.setParent(this.gameBoard);
+            pawnDropSelector.setLocalPosition(position[0], position[1], position[2]);
+            pawnDropSelector.clickable = true;
+            pawnDropSelector.addComponent({
+                enabled: true,
+                onClick: function(object)
+                {
+                    connectManager.processMove(i, j);
+                }
+                //TODO: Maybe highlight on mouse enter/exit?
+            });
+            this.gameScene.addEntity(pawnDropSelector);
+        }
+    }
 
     let inputManager = this.gameEngine.input;
     cameraPivot.addComponent({
@@ -132,8 +130,24 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameEngine.loadScene(this.gameScene);
 }
 
+Connect4Manager.prototype.processMove = function(row, column)
+{
+    if(this.dropPiece(this.currentPlayer, row, column))
+    {
+        setTimeout(function () {
+            this.resetGame();
+        }.bind(this), 5000);
+    }
+    else
+    {
+        this.currentPlayer = (this.currentPlayer + 1) % 2;
+        //TODO: GUI
+    }
+}
+
 Connect4Manager.prototype.dropPiece = function(player, row, column)
 {
+    if(player == undefined) return false;
     var designedStack = this.gameState[row][column];
     if(this.gameScene && designedStack && designedStack.length < gameMaxStack)
     {
@@ -178,10 +192,8 @@ Connect4Manager.prototype.dropPiece = function(player, row, column)
         if(this.processWinCondition(player, row, column, depth-1))
         {
             console.log(player + " has won!");
-            return false;
+            return true;
         }
-
-        return true;
     }
     
     return false;

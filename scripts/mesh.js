@@ -19,8 +19,9 @@ Mesh.prototype.loadObj = async function(filename)
 
 Mesh.prototype.getVAO = function(shader)
 {
-    if(this.vertexArrayMap[shader])
-        return this.vertexArrayMap[shader];
+    let cachedVAO = this.vertexArrayMap[shader];
+    if(cachedVAO)
+        return cachedVAO;
     else
     {
         var vao = gl.createVertexArray();

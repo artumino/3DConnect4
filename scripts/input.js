@@ -23,18 +23,37 @@ Input.prototype.lateUpdate = function()
     this.scroll = 0;
 
     //Detect mouse locations and events
+    const pixelX = this.mousePosition[0] * gl.canvas.width / gl.canvas.clientWidth;
+    const pixelY = gl.canvas.height - this.mousePosition[1] * gl.canvas.height / gl.canvas.clientHeight - 1;
     const data = new Uint8Array(4);
-    gl.readPixels(this.mousePosition[0], gl.canvas.height - this.mousePosition[1], 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
-    this.selectedEntityId = Entity.decodeId(data);
+    gl.readPixels(pixelX, pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
+    let decodedEntityId = Entity.decodeId(data);
+
+    if(engine.currentScene && this.selectedEntityId != decodedEntityId)
+    {
+        if(this.selectedEntityId)
+        {
+            let exitedEntity = engine.currentScene.objects[this.selectedEntityId];
+            if(exitedEntity && exitedEntity.clickable) exitedEntity.processMouseExit();
+        }
+
+        if(decodedEntityId)
+        {
+            let enteredEntity = engine.currentScene.objects[decodedEntityId];
+            if(enteredEntity && enteredEntity.clickable) enteredEntity.processMouseEnter();
+        }
+    }
+    console.log(decodedEntityId);
+    this.selectedEntityId = decodedEntityId;
 }
 
 Input.prototype.onMouseDown = function(e)
 {
     this.isMouseDown = true;
 
+    console.log("Clicked " + this.selectedEntityId);
     if(this.selectedEntityId)
     {
-        debugger;
         let clickedObject = engine.currentScene.objects[this.selectedEntityId];
         if(clickedObject.clickable) clickedObject.processClick();
     }
