@@ -4,6 +4,9 @@ var page = path.split("/").pop();
 var baseDir = window.location.href.replace(page, '');
 
 var GameEngine = function() {
+    this.entityTexture = undefined;
+    this.entityBuffer = undefined;
+    this.depthBuffer = undefined;
     this.currentScene = undefined;
     this.aspect = 0;
     this.projectionMatrix = [];
@@ -31,6 +34,8 @@ GameEngine.prototype.init = async function()
 
     this.uberShader = Shader.getShader("ubershader");
     await this.uberShader.loader;
+    this.entityShader = Shader.getShader("entity");
+    await this.entityShader.loader;
 
     gl.useProgram(this.uberShader.program);
 
@@ -41,14 +46,44 @@ GameEngine.prototype.init = async function()
 GameEngine.prototype.main = function()
 {
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    //Setup all the buffers
+    this.setupBuffers();
+
+    //Initialize scene
+    this.onInit();
+
+    requestAnimationFrame(this.update.bind(this));
+}
+
+GameEngine.prototype.setupBuffers = function()
+{
+    //Frame Buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.clearColor(0, 0, 0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
 
-    this.onInit();
+    //Depth Buffer
+    this.depthBuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
 
-    requestAnimationFrame(this.update.bind(this));
+    //Setup texture where entity IDs will be rendered
+    this.entityTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.entityTexture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);  
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.canvas.width, gl.canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.canvas.width, gl.canvas.height);
+
+    //Entity buffer
+    this.entityBuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.entityBuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.entityTexture, 0);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
 }
 
 GameEngine.prototype.update = function(time)
@@ -57,6 +92,7 @@ GameEngine.prototype.update = function(time)
     this.deltaTime = newTime - this.time;
     this.time = newTime;
 
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.clearColor(0, 0, 0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -79,59 +115,25 @@ GameEngine.prototype.update = function(time)
         //Game Logic Update
         this.currentScene.sceneRoot.update(this.deltaTime);
 
-        //Draw
+        //Calculate MVPs
+        let modelViewProjectionCache = {};
         Object.values(this.currentScene.objects).forEach(sceneObject => {
             if(sceneObject.draw)
-            {
-                var shader = sceneObject.shader;
-                gl.useProgram(shader.program);
+                modelViewProjectionCache[sceneObject.id] = utils.transposeMatrix(utils.multiplyMatrices(this.viewProjectionMatrix, sceneObject.worldMatrix));
+        });
 
-                if(shader.params["matrix_MVP"])
-                    gl.uniformMatrix4fv(shader.params["matrix_MVP"], gl.FALSE, utils.transposeMatrix(utils.multiplyMatrices(this.viewProjectionMatrix, sceneObject.worldMatrix)));
+        //Draw Scene
+        Object.values(this.currentScene.objects).forEach(sceneObject => {
+            if(sceneObject.draw)
+                this.drawObject(sceneObject, modelViewProjectionCache[sceneObject.id]);
+        });
 
-                if(shader.params["imatrix_VP"])
-                    gl.uniformMatrix4fv(shader.params["imatrix_VP"], gl.FALSE, utils.transposeMatrix(this.inverseViewProjectionMatrix));
-                
-                if(shader.params["matrix_N"])
-                    gl.uniformMatrix4fv(shader.params["matrix_N"], gl.FALSE, utils.transposeMatrix(utils.invertMatrix(utils.transposeMatrix(sceneObject.worldMatrix))));
-
-                Object.entries(sceneObject.material).forEach(param => {
-                    let key = param[0];
-                    let value = param[1];
-                    let paramLocation = shader.params[key];
-
-                    if(paramLocation)
-                    {
-                        if(Array.isArray(value))
-                        {
-                            if(value.length == 2)
-                                gl.uniform2fv(paramLocation, value);
-                            else if(value.length == 3)
-                                gl.uniform3fv(paramLocation, value);
-                            else if(value.length == 4)
-                                gl.uniform4fv(paramLocation, value);
-                        }
-                        else if(value instanceof Texture)
-                        {
-                            gl.activeTexture(gl.TEXTURE0);
-                            gl.bindTexture(gl.TEXTURE_2D, value.handle);
-                            gl.uniform1i(paramLocation, 0);
-                        }
-                        else if(value instanceof Cubemap)
-                        {
-                            gl.activeTexture(gl.TEXTURE0+3);
-                            gl.bindTexture(gl.TEXTURE_CUBE_MAP, value.handle);
-                            gl.uniform1i(paramLocation, 3);
-                        }
-                        else if(Number.isInteger(value))
-                            gl.uniform1i(paramLocation, value);
-                        else
-                            gl.uniform1f(paramLocation, value);
-                    }
-                });
-                
-                sceneObject.draw();
-            }
+        //Draw EntityID buffer
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.entityBuffer);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        Object.values(this.currentScene.objects).forEach(sceneObject => {
+            if(sceneObject.draw && sceneObject.clickable)
+                this.drawObject(sceneObject, modelViewProjectionCache[sceneObject.id], this.entityShader);
         });
     }
 
@@ -139,6 +141,65 @@ GameEngine.prototype.update = function(time)
     this.input.lateUpdate();
 
     requestAnimationFrame(this.update.bind(this));
+}
+
+GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverride)
+{
+    var shader = shaderOverride || sceneObject.shader;
+    if(shader)
+    {
+        gl.useProgram(shader.program);
+
+        if(shader.params["matrix_MVP"])
+            gl.uniformMatrix4fv(shader.params["matrix_MVP"], gl.FALSE, matrixMVP);
+
+        if(shader.params["imatrix_VP"])
+            gl.uniformMatrix4fv(shader.params["imatrix_VP"], gl.FALSE, utils.transposeMatrix(this.inverseViewProjectionMatrix));
+        
+        if(shader.params["matrix_N"])
+            gl.uniformMatrix4fv(shader.params["matrix_N"], gl.FALSE, utils.transposeMatrix(utils.invertMatrix(utils.transposeMatrix(sceneObject.worldMatrix))));
+        
+        if(shader.params["entityID"])
+            gl.uniform4fv(shader.params["entityID"], sceneObject.encodedEntityID);
+
+        //Setup Material Properties
+        Object.entries(sceneObject.material).forEach(param => {
+            let key = param[0];
+            let value = param[1];
+            let paramLocation = shader.params[key];
+
+            if(paramLocation)
+            {
+                if(Array.isArray(value))
+                {
+                    if(value.length == 2)
+                        gl.uniform2fv(paramLocation, value);
+                    else if(value.length == 3)
+                        gl.uniform3fv(paramLocation, value);
+                    else if(value.length == 4)
+                        gl.uniform4fv(paramLocation, value);
+                }
+                else if(value instanceof Texture)
+                {
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, value.handle);
+                    gl.uniform1i(paramLocation, 0);
+                }
+                else if(value instanceof Cubemap)
+                {
+                    gl.activeTexture(gl.TEXTURE0+3);
+                    gl.bindTexture(gl.TEXTURE_CUBE_MAP, value.handle);
+                    gl.uniform1i(paramLocation, 3);
+                }
+                else if(Number.isInteger(value))
+                    gl.uniform1i(paramLocation, value);
+                else
+                    gl.uniform1f(paramLocation, value);
+            }
+        });
+        
+        sceneObject.draw();
+    }
 }
 
 GameEngine.prototype.loadScene = function(scene)

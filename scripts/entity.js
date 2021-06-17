@@ -3,6 +3,8 @@ var Entity = function(name)
 {
     this.name = name;
     this.id = lastEntityId++;
+    this.encodedEntityID = this.encodeID();
+    this.clickable = false;
     this.enabled = true;
     this.childs = [];
     this.components = [];
@@ -16,6 +18,16 @@ var Entity = function(name)
 /*
         SCENE LOGIC
 */
+Entity.prototype.encodeID = function()
+{
+    return [
+        ((this.id >>  0) & 0xFF) / 0xFF,
+        ((this.id >>  8) & 0xFF) / 0xFF,
+        ((this.id >> 16) & 0xFF) / 0xFF,
+        ((this.id >> 24) & 0xFF) / 0xFF,
+    ];
+}
+
 Entity.prototype.setParent = function(parent)
 {
     if(this.parent)
@@ -138,3 +150,16 @@ Entity.prototype.update = function(deltaTime)
         });
     }
 }
+
+Entity.prototype.processClick = function()
+{
+    if(this.clickable)
+    {
+        this.components.forEach(component => {
+            if(component.enabled && component.onClick)
+            {
+                component.onClick(this);
+            }
+        }).bind(this);
+    }
+};

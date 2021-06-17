@@ -7,7 +7,7 @@ var DirectionalLight = function(name, lightColor)
 
 DirectionalLight.prototype = Object.create(Entity.prototype);
 
-DirectionalLight.prototype.setDirectionTo(entity)
+DirectionalLight.prototype.setDirectionTo = function(entity)
 {
     this.direction = computeVersor(this.localPosition, entity.localPosition);
 }
