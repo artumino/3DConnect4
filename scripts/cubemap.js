@@ -4,31 +4,31 @@ var Cubemap = function(name)
     this.handle = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.handle);
 
-    var skyboxName = baseDir + "assets/" + name;
+    var skyboxName = baseDir + "assets/skyboxes/" + name;
     const faceInfos = [
         {
             target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, 
-            url: skyboxName + '_posx.jpg',
+            url: skyboxName + '/posx.jpg',
         },
         {
             target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X, 
-            url:  skyboxName + '_negx.jpg',
+            url:  skyboxName + '/negx.jpg',
         },
         {
             target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y, 
-            url:  skyboxName + '_posy.jpg',
+            url:  skyboxName + '/posy.jpg',
         },
         {
             target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, 
-            url:  skyboxName + '_negy.jpg',
+            url:  skyboxName + '/negy.jpg',
         },
         {
             target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z, 
-            url:  skyboxName + '_posz.jpg',
+            url:  skyboxName + '/posz.jpg',
         },
         {
             target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, 
-            url:  skyboxName + '_negz.jpg',
+            url:  skyboxName + '/negz.jpg',
         },
     ];
 

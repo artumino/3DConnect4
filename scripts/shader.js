@@ -8,7 +8,7 @@ var Shader = function(name)
 
 Shader.prototype.load = async function()
 {
-    var shaderDir = baseDir + "shaders/"; 
+    var shaderDir = baseDir + "shaders/" + this.name + "/"; 
     var that = this;
 
     await utils.loadFiles([shaderDir + this.name + '_vs.glsl', shaderDir + this.name + '_fs.glsl', shaderDir + this.name + '.params'], function (shaderText) {

@@ -49,7 +49,7 @@ Connect4Manager.prototype.reloadScene = function()
 
     var skyBox = new Skybox("Skybox", {
         blurFactor: 2,
-        mainTexture: Cubemap.getOrCreate("skybox/beach")
+        mainTexture: Cubemap.getOrCreate("room")
     }, Shader.getShader("skybox"));
 
     this.gameScene.addEntity(cameraPivot);
