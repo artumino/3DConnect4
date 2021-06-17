@@ -3,8 +3,8 @@ var Entity = function(name)
 {
     this.name = name;
     this.id = lastEntityId++;
-    this.encodedEntityID = this.encodeID();
-    this.clickable = false;
+    this.encodedEntityID = Entity.encodeId(this.id);
+    this.clickable = true;
     this.enabled = true;
     this.childs = [];
     this.components = [];
@@ -18,16 +18,6 @@ var Entity = function(name)
 /*
         SCENE LOGIC
 */
-Entity.prototype.encodeID = function()
-{
-    return [
-        ((this.id >>  0) & 0xFF) / 0xFF,
-        ((this.id >>  8) & 0xFF) / 0xFF,
-        ((this.id >> 16) & 0xFF) / 0xFF,
-        ((this.id >> 24) & 0xFF) / 0xFF,
-    ];
-}
-
 Entity.prototype.setParent = function(parent)
 {
     if(this.parent)
@@ -163,3 +153,21 @@ Entity.prototype.processClick = function()
         }).bind(this);
     }
 };
+
+/*
+    Entity ID Encoding
+*/
+Entity.encodeId = function(id)
+{
+    return [
+        ((id >>  0) & 0xFF) / 0xFF,
+        ((id >>  8) & 0xFF) / 0xFF,
+        ((id >> 16) & 0xFF) / 0xFF,
+        ((id >> 24) & 0xFF) / 0xFF,
+    ];
+}
+
+Entity.decodeId = function(idVector)
+{
+    return idVector[0] + (idVector[1] << 8) + (idVector[2] << 16) + (idVector[3] << 24);
+}

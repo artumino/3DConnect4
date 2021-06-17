@@ -130,6 +130,7 @@ GameEngine.prototype.update = function(time)
 
         //Draw EntityID buffer
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.entityBuffer);
+        gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         Object.values(this.currentScene.objects).forEach(sceneObject => {
             if(sceneObject.draw && sceneObject.clickable)
