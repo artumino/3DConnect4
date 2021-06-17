@@ -124,16 +124,16 @@ GameEngine.prototype.update = function(time)
 
         //Draw Scene
         Object.values(this.currentScene.objects).forEach(sceneObject => {
-            if(sceneObject.draw)
+            if(sceneObject.draw && sceneObject.enabled)
                 this.drawObject(sceneObject, modelViewProjectionCache[sceneObject.id]);
         });
 
         //Draw EntityID buffer
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.entityBuffer);
-        gl.clearColor(0, 0, 0, 0);
+        gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
         Object.values(this.currentScene.objects).forEach(sceneObject => {
-            if(sceneObject.draw && sceneObject.clickable)
+            if(sceneObject.draw && sceneObject.enabled && sceneObject.clickable)
                 this.drawObject(sceneObject, modelViewProjectionCache[sceneObject.id], this.entityShader);
         });
     }

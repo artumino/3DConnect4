@@ -1,12 +1,10 @@
 {
     "uniforms" : [
         "matrix_MVP",
-        "mainTexture"
+        "entityID"
     ],
     
     "attributes" : [
-        "inPosition0",
-        "inNormal0",
-        "inUV0"
+        "inPosition0"
     ]
 }

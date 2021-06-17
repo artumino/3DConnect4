@@ -1,10 +1,13 @@
 var lastEntityId = 0;
+const notAdmittedID = 255 << 24;
 var Entity = function(name) 
 {
     this.name = name;
     this.id = lastEntityId++;
+    if(lastEntityId == notAdmittedID)
+        lastEntityId++;
     this.encodedEntityID = Entity.encodeId(this.id);
-    this.clickable = true;
+    this.clickable = false;
     this.enabled = true;
     this.childs = [];
     this.components = [];
@@ -128,7 +131,7 @@ Entity.prototype.update = function(deltaTime)
     if(this.enabled)
     {
         this.components.forEach(component => {
-            if(component.enabled)
+            if(component.enabled && component.update)
             {
                 component.update(this, deltaTime);
             }
@@ -169,5 +172,6 @@ Entity.encodeId = function(id)
 
 Entity.decodeId = function(idVector)
 {
-    return idVector[0] + (idVector[1] << 8) + (idVector[2] << 16) + (idVector[3] << 24);
+    let decoded = idVector[0] + (idVector[1] << 8) + (idVector[2] << 16) + (idVector[3] << 24);
+    return decoded != notAdmittedID ? decoded : undefined;
 }

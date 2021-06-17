@@ -23,17 +23,21 @@ Input.prototype.lateUpdate = function()
     this.scroll = 0;
 
     //Detect mouse locations and events
-    const pixelX = this.mousePosition[0] * gl.canvas.width / gl.canvas.clientWidth; //Convert from browser space to canvas space
-    const pixelY = gl.canvas.height - this.mousePosition[1] * gl.canvas.height / gl.canvas.clientHeight - 1;
     const data = new Uint8Array(4);
-    gl.readPixels(pixelX, pixelY, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
+    gl.readPixels(this.mousePosition[0], gl.canvas.height - this.mousePosition[1], 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, data);
     this.selectedEntityId = Entity.decodeId(data);
-    //console.log(this.selectedEntityId);
 }
 
 Input.prototype.onMouseDown = function(e)
 {
     this.isMouseDown = true;
+
+    if(this.selectedEntityId)
+    {
+        debugger;
+        let clickedObject = engine.currentScene.objects[this.selectedEntityId];
+        if(clickedObject.clickable) clickedObject.processClick();
+    }
 }
 
 Input.prototype.OnMouseUp = function(e)

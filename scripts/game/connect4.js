@@ -29,25 +29,27 @@ Connect4Manager.prototype.resetGame = function()
 
 Connect4Manager.prototype.reloadScene = function()
 {
+    let connectManager = this;
     mouseStartPosition = null;
     this.gameScene  = new Scene();
 
-    var cameraPivot = new Entity("CameraPivot");
+    let cameraPivot = new Entity("CameraPivot");
 
-    var cameraGimbal = new Entity("CameraGimbal");
+    let cameraGimbal = new Entity("CameraGimbal");
     cameraGimbal.setLocalEulerRotation(0, -30, 0);
     cameraGimbal.setParent(cameraPivot);
 
-    var mainCamera = new Camera("Main Camera");
+    let mainCamera = new Camera("Main Camera");
     mainCamera.setParent(cameraGimbal);
     mainCamera.move(0, 0, -20);
     
     this.gameBoard = new DrawableEntity("GameBoard", {
         mainTexture: Texture.getOrCreate("WoodM1.jpg")
     }, meshLoader.base, Shader.getShader("ubershader"));
+    this.gameBoard.clickable = true;
     this.gameBoard.move(0, -2, 0);
 
-    var skyBox = new Skybox("Skybox", {
+    let skyBox = new Skybox("Skybox", {
         blurFactor: 2,
         mainTexture: Cubemap.getOrCreate("room")
     }, Shader.getShader("skybox"));
@@ -57,7 +59,35 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameScene.addEntity(this.gameBoard);
     this.gameScene.addEntity(skyBox);
 
-    var inputManager = this.gameEngine.input;
+    //Pawn Drop Selectors
+    //for(let i = 0; i < gameRows; i++)
+    //{
+    //    for(let j = 0; i < gameColumns; j++)
+    //    {
+    //        let pawnDropSelector = new DrawableEntity("PawnSelector_" + i + "_" + j, 
+    //                                                  undefined,
+    //                                                  meshLoader.pawnSelector,
+    //                                                  undefined);
+    //        pawnDropSelector.setParent(this.gameBoard);
+    //        pawnDropSelector.clickable = true;
+    //        pawnDropSelector.addComponent({
+    //            enabled: true,
+    //            onClick: function(object)
+    //            {
+    //                if(connectManager.dropPiece(connectManager.player, i, j))
+    //                {
+    //                    setTimeout(function () {
+    //                        connectManager.resetGame();
+    //                    }, 5000);
+    //                }
+    //            }
+    //            //TODO: Maybe highlight on mouse enter/exit?
+    //        });
+    //        this.gameScene.addEntity(pawnDropSelector);
+    //    }
+    //}
+
+    let inputManager = this.gameEngine.input;
     cameraPivot.addComponent({
         enabled: true,
         update: function(object, deltaTime)
@@ -94,38 +124,6 @@ Connect4Manager.prototype.reloadScene = function()
             {
                 let degrees = [ inputManager.mouseDelta[0] * 180 / gl.canvas.width, inputManager.mouseDelta[1] * 180 / gl.canvas.height ];
                 object.rotateEuler(0, -degrees[1], 0);
-            }
-        }
-    });
-
-    let connectManager = this;
-    cameraPivot.addComponent({
-        enabled: true,
-        time: 0.0,
-        lastInsertion: [0, 0],
-        player: 0,
-        terminated: false,
-        update: function(object, deltaTime)
-        {
-            this.time += deltaTime;
-            if(this.time > 0.1)
-            {
-                if(!this.terminated)
-                {
-                    this.player = Math.ceil(Math.random() * 1000);
-                    this.terminated = !connectManager.dropPiece(this.player % 2, this.lastInsertion[0], this.lastInsertion[1]);
-                    this.lastInsertion[1] += 1;
-                    if(this.lastInsertion[1] >= gameColumns)
-                    {
-                        this.lastInsertion[1] = 0;
-                        this.lastInsertion[0] += 1;
-                        if(this.lastInsertion[0] >= gameRows)
-                            this.lastInsertion[0] = 0;
-                    }
-                    this.time = 0;
-                }
-                else if(this.time > 5)
-                    connectManager.resetGame();
             }
         }
     });
