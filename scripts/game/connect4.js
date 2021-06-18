@@ -63,6 +63,12 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameScene.addEntity(this.gameBoard);
     this.gameScene.addEntity(skyBox);
 
+    //Lights
+    let directionalLight = new DirectionalLight("DirectionalLight", [ 1, 1, 1 ]);
+    directionalLight.setLocalPosition(-10, 10, 0);
+    directionalLight.setDirectionTo(this.gameBoard);
+    this.gameScene.addEntity(directionalLight);
+
     //Pawn Drop Selectors
     for(let i = 0; i < gameRows; i++)
     {

@@ -9,7 +9,7 @@ DirectionalLight.prototype = Object.create(Entity.prototype);
 
 DirectionalLight.prototype.setDirectionTo = function(entity)
 {
-    this.direction = computeVersor(this.localPosition, entity.localPosition);
+    this.direction = computeVersor(entity.localPosition, this.localPosition);
 }
 
 Object.defineProperty(DirectionalLight.prototype, 'constructor', { value: DirectionalLight, enumerable: false, writable: true});

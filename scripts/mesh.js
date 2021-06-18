@@ -12,7 +12,7 @@ Mesh.prototype.loadObj = async function(filename)
     let objStr = await utils.get_objstr(filename);
     let objModel = new OBJ.Mesh(objStr);
     this.vertices = objModel.vertices;
-    this.normals = objModel.normals;
+    this.normals = objModel.vertexNormals;
     this.indices = objModel.indices;
     this.texels = objModel.textures;
 }

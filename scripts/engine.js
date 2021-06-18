@@ -165,6 +165,38 @@ GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverrid
         if(shader.params["entityID"])
             gl.uniform4fv(shader.params["entityID"], sceneObject.encodedEntityID);
 
+        if(shader.params["directionalLightDir"])
+            gl.uniform3fv(shader.params["directionalLightDir"], this.currentScene.activeDirectionalLight.direction);
+        
+        if(shader.params["directionalLightColor"])
+            gl.uniform3fv(shader.params["directionalLightColor"], this.currentScene.activeDirectionalLight.lightColor);
+
+        if(shader.params["pointLightLocations"])
+            gl.uniformMatrix4fv(shader.params["pointLightLocations"], gl.FALSE, arrayParamToMatrix4(
+                this.currentScene.activePointLights,
+                light => light.localPosition,
+                3
+            ));
+
+        if(shader.params["pointLightColors"])
+            gl.uniformMatrix4fv(shader.params["pointLightColors"], gl.FALSE, arrayParamToMatrix4(
+                this.currentScene.activePointLights,
+                light => light.lightColor,
+                3
+            ));
+
+        if(shader.params["pointLightDecays"])
+            gl.uniform4fv(shader.params["pointLightDecays"], gl.FALSE, arrayParamToVec4(
+                this.currentScene.activePointLights,
+                light => light.decay
+            ));
+
+        if(shader.params["pointLightReductions"])
+            gl.uniform4fv(shader.params["pointLightReductions"], gl.FALSE, arrayParamToVec4(
+                this.currentScene.activePointLights,
+                light => light.reductionDistance
+            ));
+
         //Setup Material Properties
         if(sceneObject.material)
         {

@@ -1,7 +1,10 @@
 {
     "uniforms" : [
         "matrix_MVP",
-        "mainTexture"
+        "matrix_N",
+        "mainTexture",
+        "directionalLightDir",
+        "directionalLightColor"
     ],
     
     "attributes" : [
