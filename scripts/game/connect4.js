@@ -6,6 +6,7 @@ var Connect4Manager = function(gameEngine)
 {
     this.gameEngine = gameEngine;
     this.currentPlayer = 0;
+    this.winner = undefined;
     this.gameScene = undefined;
     this.gameBoard = undefined;
     this.gameState = undefined;
@@ -22,6 +23,8 @@ Connect4Manager.prototype.resetGame = function()
             columns[j] = [];
         this.gameState[i] = columns;
     }
+    this.currentPlayer = 0;
+    this.winner = undefined;
 
 
     //Reset Game Scene
@@ -147,7 +150,7 @@ Connect4Manager.prototype.processMove = function(row, column)
 
 Connect4Manager.prototype.dropPiece = function(player, row, column)
 {
-    if(player == undefined) return false;
+    if(player == undefined || this.winner != undefined) return false;
     var designedStack = this.gameState[row][column];
     if(this.gameScene && designedStack && designedStack.length < gameMaxStack)
     {
@@ -192,6 +195,7 @@ Connect4Manager.prototype.dropPiece = function(player, row, column)
         if(this.processWinCondition(player, row, column, depth-1))
         {
             console.log(player + " has won!");
+            this.winner = player;
             return true;
         }
     }
