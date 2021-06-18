@@ -8,11 +8,26 @@
     <style type="text/css">
       body {
         margin: 0;
+        position: relative;
         background-color: gray;
       }
       canvas {
         display: block;
         background-color: white;
+      }
+      .messageBox {
+          position: absolute;
+          color: white;
+          width: 100%;
+          text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+          text-align: center;
+          font-size: 30pt;
+          user-select: none;
+          pointer-events: none;
+      }
+      #gameStateMessage {
+        top: 10px;
+        left: 0;
       }
     </style>
 </head>
@@ -20,6 +35,7 @@
 
 <body>
   <canvas id="canvas"></canvas>
+  <div id="gameStateMessage" class="messageBox"></div>
 
   <!-- Libraries -->
   <script type="text/javascript" src="lib/utils.js"></script>

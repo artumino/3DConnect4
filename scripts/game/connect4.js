@@ -10,6 +10,7 @@ var Connect4Manager = function(gameEngine)
     this.gameScene = undefined;
     this.gameBoard = undefined;
     this.gameState = undefined;
+    this.gameStateMessage = document.getElementById("gameStateMessage");
 }
 
 Connect4Manager.prototype.resetGame = function()
@@ -26,9 +27,16 @@ Connect4Manager.prototype.resetGame = function()
     this.currentPlayer = 0;
     this.winner = undefined;
 
+    //Update message
+    this.updateStateMessage(this.currentPlayer, false);
 
     //Reset Game Scene
     this.reloadScene();
+}
+
+Connect4Manager.prototype.updateStateMessage = function(player, won)
+{
+    this.gameStateMessage.innerText = "Player " + (player+1) + (won ? " won!" : "");
 }
 
 Connect4Manager.prototype.reloadScene = function()
@@ -151,8 +159,11 @@ Connect4Manager.prototype.reloadScene = function()
 
 Connect4Manager.prototype.processMove = function(row, column)
 {
+    if(this.winner != undefined) return;
+
     if(this.dropPiece(this.currentPlayer, row, column))
     {
+        this.updateStateMessage(this.currentPlayer, true);
         setTimeout(function () {
             this.resetGame();
         }.bind(this), 5000);
@@ -160,7 +171,7 @@ Connect4Manager.prototype.processMove = function(row, column)
     else
     {
         this.currentPlayer = (this.currentPlayer + 1) % 2;
-        //TODO: GUI
+        this.updateStateMessage(this.currentPlayer, false);
     }
 }
 
