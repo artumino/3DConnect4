@@ -229,6 +229,8 @@ Connect4Manager.prototype.processWinCondition = function(player, row, column, de
         [0,-1,1], //Vertical Plane Diagonal4
         [1,1,1], //Cube Diagonal1
         [-1,-1,1], //Cube Diagonal2
+        [1,-1,-1] //Cube Diagonal3
+        [-1,1,-1] //Cube Diagonal4
     ];
 
     var that = this;
