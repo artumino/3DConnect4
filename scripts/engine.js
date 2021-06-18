@@ -115,17 +115,29 @@ GameEngine.prototype.update = function(time)
         //Game Logic Update
         this.currentScene.sceneRoot.update(this.deltaTime);
 
-        //Calculate MVPs
+        //Calculate MVPs and build render queues
         let modelViewProjectionCache = {};
+        let renderQueues = {};
         Object.values(this.currentScene.objects).forEach(sceneObject => {
             if(sceneObject.draw)
+            {
                 modelViewProjectionCache[sceneObject.id] = utils.transposeMatrix(utils.multiplyMatrices(this.viewProjectionMatrix, sceneObject.worldMatrix));
+
+                if(sceneObject.shader)
+                {
+                    let renqueQueue = sceneObject.shader.order;
+                    if(!renderQueues[renqueQueue]) renderQueues[renqueQueue] = [];
+                    renderQueues[renqueQueue].push(sceneObject);
+                }
+            }
         });
 
         //Draw Scene
-        Object.values(this.currentScene.objects).forEach(sceneObject => {
-            if(sceneObject.draw && sceneObject.enabled)
-                this.drawObject(sceneObject, modelViewProjectionCache[sceneObject.id]);
+        Object.keys(renderQueues).forEach(queue => {
+            Object.values(renderQueues[queue]).forEach(sceneObject => {
+                if(sceneObject.draw && sceneObject.enabled)
+                    this.drawObject(sceneObject, modelViewProjectionCache[sceneObject.id]);
+            });
         });
 
         //Draw EntityID buffer
@@ -152,6 +164,12 @@ GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverrid
     if(shader)
     {
         gl.useProgram(shader.program);
+
+        if(shader.transparent)
+        {
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+            gl.enable(gl.BLEND);
+        }
 
         if(shader.params["matrix_MVP"])
             gl.uniformMatrix4fv(shader.params["matrix_MVP"], gl.FALSE, matrixMVP);
@@ -239,6 +257,8 @@ GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverrid
         if(originalShader != shader) sceneObject.shader = shader;
         sceneObject.draw();
         if(originalShader != shader) sceneObject.shader = originalShader;
+
+        if(shader.transparent) gl.disable(gl.BLEND);
     }
 }
 

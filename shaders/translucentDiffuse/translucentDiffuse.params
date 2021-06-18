@@ -1,0 +1,13 @@
+{
+    "uniforms" : [
+        "matrix_MVP",
+        "diffuseColor"
+    ],
+    
+    "attributes" : [
+        "inPosition0"
+    ],
+
+    "transparent" : true,
+    "order" : 1000
+}

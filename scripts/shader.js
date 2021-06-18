@@ -15,6 +15,9 @@ Shader.prototype.load = async function()
         that.program = utils.createAndCompileShaders(gl, shaderText);
         var paramDefinition = JSON.parse(shaderText[2]);
         
+        that.transparent = paramDefinition["transparent"];
+        that.order = paramDefinition["order"] || 0;
+
         paramDefinition["uniforms"].forEach(paramName => {
             that.params[paramName] = gl.getUniformLocation(that.program, paramName);
         });

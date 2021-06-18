@@ -76,7 +76,9 @@ Connect4Manager.prototype.reloadScene = function()
         {
             let position = this.fromStateToBoardCoords(i, j, 0);
             let pawnDropSelector = new DrawableEntity("PawnDropSelector_" + i + "_" + j, 
-                                                      undefined,
+                                                      {
+                                                        diffuseColor: [0.3, 0.3, 0, 0.4]
+                                                      },
                                                       meshLoader.pawnDropSelector,
                                                       undefined);
             pawnDropSelector.setParent(this.gameBoard);
@@ -87,7 +89,15 @@ Connect4Manager.prototype.reloadScene = function()
                 onClick: function(object)
                 {
                     connectManager.processMove(i, j);
-                }
+                },
+                onMouseEnter: function(object)
+                {
+                    object.shader = Shader.getShader("translucentDiffuse");
+                },
+                onMouseExit: function(object)
+                {
+                    object.shader = undefined;
+                },
                 //TODO: Maybe highlight on mouse enter/exit?
             });
             this.gameScene.addEntity(pawnDropSelector);
@@ -229,7 +239,7 @@ Connect4Manager.prototype.processWinCondition = function(player, row, column, de
         [0,-1,1], //Vertical Plane Diagonal4
         [1,1,1], //Cube Diagonal1
         [-1,-1,1], //Cube Diagonal2
-        [1,-1,-1] //Cube Diagonal3
+        [1,-1,-1], //Cube Diagonal3
         [-1,1,-1] //Cube Diagonal4
     ];
 
