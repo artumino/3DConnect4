@@ -131,7 +131,8 @@ GameEngine.prototype.update = function(time)
         //Draw EntityID buffer
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.entityBuffer);
         gl.clearColor(0, 0, 0, 1);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        //We have to clear the depthBuffer cause the opaque geometry is different
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         Object.values(this.currentScene.objects).forEach(sceneObject => {
             if(sceneObject.draw && sceneObject.enabled && sceneObject.clickable)
                 this.drawObject(sceneObject, modelViewProjectionCache[sceneObject.id], this.entityShader);
