@@ -192,7 +192,7 @@ GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverrid
         if(shader.params["pointLightLocations"])
             gl.uniformMatrix4fv(shader.params["pointLightLocations"], gl.FALSE, arrayParamToMatrix4(
                 this.currentScene.activePointLights,
-                light => light.localPosition,
+                light => light.getWorldPosition(),
                 3
             ));
 
