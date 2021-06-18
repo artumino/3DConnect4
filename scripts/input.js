@@ -43,7 +43,6 @@ Input.prototype.lateUpdate = function()
             if(enteredEntity && enteredEntity.clickable) enteredEntity.processMouseEnter();
         }
     }
-    console.log(decodedEntityId);
     this.selectedEntityId = decodedEntityId;
 }
 
