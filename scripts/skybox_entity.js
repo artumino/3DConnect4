@@ -1,4 +1,4 @@
-var Skybox = function(name, material, shader)
+var Skybox = function(name, skyboxMap, reflectionMap, ambientIntensity, material, shader)
 {
     Entity.call(this, name);
     this.skyboxVertPos = new Float32Array(
@@ -11,7 +11,11 @@ var Skybox = function(name, material, shader)
         1,  1, 1.0,
     ]);
     this.shader = shader;
-    this.material = material;
+    this.ambientIntensity = ambientIntensity;
+    this.material = material || {};
+    this.material.mainTexture = skyboxMap;
+    this.skyMap = skyboxMap;
+    this.reflectionMap = reflectionMap;
     this.vao = undefined;
 }
 

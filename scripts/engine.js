@@ -183,11 +183,30 @@ GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverrid
         if(shader.params["entityID"])
             gl.uniform4fv(shader.params["entityID"], sceneObject.encodedEntityID);
 
-        if(shader.params["directionalLightDir"])
-            gl.uniform3fv(shader.params["directionalLightDir"], this.currentScene.activeDirectionalLight.direction);
-        
-        if(shader.params["directionalLightColor"])
-            gl.uniform3fv(shader.params["directionalLightColor"], this.currentScene.activeDirectionalLight.lightColor);
+        //Ambient parameters
+        if(this.currentScene.activeSkybox)
+        {
+            let skybox = this.currentScene.activeSkybox;
+
+            if(shader.params["ambientCubemap"])
+            {
+                gl.activeTexture(gl.TEXTURE0+3);
+                gl.bindTexture(gl.TEXTURE_CUBE_MAP, skybox.reflectionMap.handle);
+                gl.uniform1i(shader.params["ambientCubemap"], 3);
+            }
+
+            if(shader.params["ambientIntensity"])
+                gl.uniform1f(shader.params["ambientIntensity"], skybox.ambientIntensity);
+        }
+
+        if(this.currentScene.activeDirectionalLight)
+        {
+            if(shader.params["directionalLightDir"])
+                gl.uniform3fv(shader.params["directionalLightDir"], this.currentScene.activeDirectionalLight.direction);
+            
+            if(shader.params["directionalLightColor"])
+                gl.uniform3fv(shader.params["directionalLightColor"], this.currentScene.activeDirectionalLight.lightColor);
+        }
 
         if(shader.params["pointLightLocations"])
             gl.uniformMatrix4fv(shader.params["pointLightLocations"], gl.FALSE, arrayParamToMatrix4(

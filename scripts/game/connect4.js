@@ -61,9 +61,8 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameBoard.clickable = true;
     this.gameBoard.move(0, -2, 0);
 
-    let skyBox = new Skybox("Skybox", {
-        blurFactor: 2,
-        mainTexture: Cubemap.getOrCreate("room")
+    let skyBox = new Skybox("Skybox", Cubemap.getOrCreate("room"), Cubemap.getOrCreate("room_reflection"), 0.75, {
+        blurFactor: 2
     }, Shader.getShader("skybox"));
 
     this.gameScene.addEntity(cameraPivot);

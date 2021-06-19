@@ -3,6 +3,8 @@
         "matrix_MVP",
         "matrix_N",
         "mainTexture",
+        "ambientCubemap",
+        "ambientIntensity",
         "directionalLightDir",
         "directionalLightColor"
     ],

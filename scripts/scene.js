@@ -4,6 +4,7 @@ var Scene = function()
     this.sceneRoot = new Entity("Root");
     this.objects[this.sceneRoot.id] = this.sceneRoot;
     this.activeCamera = undefined;
+    this.activeSkybox = undefined;
     this.activeDirectionalLight = undefined;
     this.activePointLights = [];
     this.destroyed = false;
@@ -20,6 +21,10 @@ Scene.prototype.addEntity = function(entity)
     if(entity instanceof Camera &&
         !this.activeCamera)
             this.activeCamera = entity;
+
+    if(entity instanceof Skybox &&
+        !this.activeSkybox)
+            this.activeSkybox = entity;
 
     if(entity instanceof DirectionalLight &&
         !this.activeDirectionalLight)
