@@ -72,13 +72,13 @@ Entity.prototype.predictMove = function(dx, dy, dz)
 
 Entity.prototype.setLocalEulerRotation = function(rx, ry, rz)
 {
-    this.localRotation = Quaternion.fromEuler(utils.degToRad(rx), utils.degToRad(ry), utils.degToRad(rz), order="ZXY");
+    this.localRotation = Quaternion.fromEuler(utils.degToRad(rz), utils.degToRad(rx), utils.degToRad(ry), "ZXY");
     this.updateWorldMatrix();
 };
 
 Entity.prototype.rotateEuler = function(rx, ry, rz)
 {
-    let rotation = Quaternion.fromEuler(utils.degToRad(rx), utils.degToRad(ry), utils.degToRad(rz), order="ZXY");
+    let rotation = Quaternion.fromEuler(utils.degToRad(rz), utils.degToRad(rx), utils.degToRad(ry), "ZXY");
     this.rotate(rotation);
 };
 

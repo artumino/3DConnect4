@@ -48,7 +48,7 @@ Connect4Manager.prototype.reloadScene = function()
     let cameraPivot = new Entity("CameraPivot");
 
     let cameraGimbal = new Entity("CameraGimbal");
-    cameraGimbal.setLocalEulerRotation(0, -30, 0);
+    cameraPivot.setLocalEulerRotation(-30, 0, 0);
     cameraGimbal.setParent(cameraPivot);
 
     let mainCamera = new Camera("Main Camera");
@@ -121,7 +121,7 @@ Connect4Manager.prototype.reloadScene = function()
             {
                 // Camera rotation
                 let degrees = [ inputManager.mouseDelta[0] * 180 / gl.canvas.width, inputManager.mouseDelta[1] * 180 / gl.canvas.height ];
-                object.rotateEuler(0, 0, -degrees[0]);
+                object.rotateEuler(0, -degrees[0], 0);
             }
             
             // Camera translation
@@ -148,7 +148,7 @@ Connect4Manager.prototype.reloadScene = function()
             if(inputManager.isMouseDown)
             {
                 let degrees = [ inputManager.mouseDelta[0] * 180 / gl.canvas.width, inputManager.mouseDelta[1] * 180 / gl.canvas.height ];
-                object.rotateEuler(0, -degrees[1], 0);
+                object.rotateEuler(-degrees[1], 0, 0);
             }
         }
     });
