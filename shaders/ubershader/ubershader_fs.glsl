@@ -12,7 +12,7 @@ uniform vec3 directionalLightDir;
 uniform vec3 directionalLightColor;
 
 void main() {
-  vec3 normalVec = normalVector;
+  vec3 normalVec = normalize(normalVector);
   vec3 ambientColor = texture(ambientCubemap, normalVec).xyz * ambientIntensity;
   vec3 lambertColor = clamp(dot(directionalLightDir, normalVec),0.0,1.0) * directionalLightColor + ambientColor;
   vec4 diffColor = texture(mainTexture, uvFS);

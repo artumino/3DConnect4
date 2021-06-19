@@ -61,7 +61,7 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameBoard.clickable = true;
     this.gameBoard.move(0, -2, 0);
 
-    let skyBox = new Skybox("Skybox", Cubemap.getOrCreate("room"), Cubemap.getOrCreate("room_reflection"), 0.75, {
+    let skyBox = new Skybox("Skybox", Cubemap.getOrCreate("room"), Cubemap.getOrCreate("room_reflection"), 1, {
         blurFactor: 2
     }, Shader.getShader("skybox"));
 
@@ -71,7 +71,7 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameScene.addEntity(skyBox);
 
     //Lights
-    let directionalLight = new DirectionalLight("DirectionalLight", [ 1, 1, 1 ]);
+    let directionalLight = new DirectionalLight("DirectionalLight", [ 0.5, 0.5, 0.5 ]);
     directionalLight.setLocalPosition(-10, 10, 0);
     directionalLight.setDirectionTo(this.gameBoard);
     this.gameScene.addEntity(directionalLight);
