@@ -76,6 +76,10 @@ Connect4Manager.prototype.reloadScene = function()
     directionalLight.setDirectionTo(this.gameBoard);
     this.gameScene.addEntity(directionalLight);
 
+    let pointLight = new PointLight("PointLight", [ 0, 0, 1 ], 20);
+    pointLight.setLocalPosition(10, 10, 0);
+    this.gameScene.addEntity(pointLight);
+
     //Pawn Drop Selectors
     for(let i = 0; i < gameRows; i++)
     {

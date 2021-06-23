@@ -1,7 +1,6 @@
-var PointLight = function(name, position, lightColor, reductionDistance)
+var PointLight = function(name, lightColor, reductionDistance)
 {
     Entity.call(this, name);
-    this.localPosition = position;
     this.lightColor = lightColor;
     this.decay = 0;
     this.reductionDistance = reductionDistance;

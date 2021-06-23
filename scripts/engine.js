@@ -220,10 +220,10 @@ GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverrid
                 gl.uniform3fv(shader.params["pointLightColor"], this.currentScene.activePointLight.lightColor);
 
             if(shader.params["pointLightDecay"])
-                gl.uniform3fv(shader.params["pointLightDecay"], this.currentScene.activePointLight.decay);
+                gl.uniform1f(shader.params["pointLightDecay"], this.currentScene.activePointLight.decay);
 
             if(shader.params["reductionDistance"])
-                gl.uniform3fv(shader.params["reductionDistance"], this.currentScene.activePointLight.reductionDistance);
+                gl.uniform1f(shader.params["reductionDistance"], this.currentScene.activePointLight.reductionDistance);
         }
 
         //Setup Material Properties

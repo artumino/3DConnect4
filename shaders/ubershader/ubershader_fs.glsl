@@ -12,7 +12,7 @@ uniform vec3 directionalLightDir;
 uniform vec3 directionalLightColor;
 
 uniform vec3 pointLightPosition;
-uniform vec3 reductionDistance;
+uniform float reductionDistance;
 uniform vec3 pointLightColor;
 uniform float pointLightDecay;
 in vec3 fs_pos;
