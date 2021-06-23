@@ -179,6 +179,9 @@ GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverrid
         
         if(shader.params["matrix_N"])
             gl.uniformMatrix4fv(shader.params["matrix_N"], gl.FALSE, utils.transposeMatrix(utils.invertMatrix(utils.transposeMatrix(sceneObject.worldMatrix))));
+
+        if(shader.params["matrix_W"])
+            gl.uniformMatrix4fv(shader.params["matrix_W"], gl.FALSE, utils.transposeMatrix(sceneObject.worldMatrix));
         
         if(shader.params["entityID"])
             gl.uniform4fv(shader.params["entityID"], sceneObject.encodedEntityID);
@@ -208,31 +211,20 @@ GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverrid
                 gl.uniform3fv(shader.params["directionalLightColor"], this.currentScene.activeDirectionalLight.lightColor);
         }
 
-        if(shader.params["pointLightLocations"])
-            gl.uniformMatrix4fv(shader.params["pointLightLocations"], gl.FALSE, arrayParamToMatrix4(
-                this.currentScene.activePointLights,
-                light => light.getWorldPosition(),
-                3
-            ));
+        if (this.currentScene.activePointLight)
+        {
+            if(shader.params["pointLightPosition"])
+                gl.uniform3fv(shader.params["pointLightPosition"], this.currentScene.activePointLight.localPosition);
 
-        if(shader.params["pointLightColors"])
-            gl.uniformMatrix4fv(shader.params["pointLightColors"], gl.FALSE, arrayParamToMatrix4(
-                this.currentScene.activePointLights,
-                light => light.lightColor,
-                3
-            ));
+            if(shader.params["pointLightColor"])
+                gl.uniform3fv(shader.params["pointLightColor"], this.currentScene.activePointLight.lightColor);
 
-        if(shader.params["pointLightDecays"])
-            gl.uniform4fv(shader.params["pointLightDecays"], gl.FALSE, arrayParamToVec4(
-                this.currentScene.activePointLights,
-                light => light.decay
-            ));
+            if(shader.params["pointLightDecay"])
+                gl.uniform3fv(shader.params["pointLightDecay"], this.currentScene.activePointLight.decay);
 
-        if(shader.params["pointLightReductions"])
-            gl.uniform4fv(shader.params["pointLightReductions"], gl.FALSE, arrayParamToVec4(
-                this.currentScene.activePointLights,
-                light => light.reductionDistance
-            ));
+            if(shader.params["reductionDistance"])
+                gl.uniform3fv(shader.params["reductionDistance"], this.currentScene.activePointLight.reductionDistance);
+        }
 
         //Setup Material Properties
         if(sceneObject.material)

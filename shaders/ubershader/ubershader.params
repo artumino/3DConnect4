@@ -6,7 +6,11 @@
         "ambientCubemap",
         "ambientIntensity",
         "directionalLightDir",
-        "directionalLightColor"
+        "directionalLightColor",
+        "pointLightPosition",
+        "reductionDistance",
+        "pointLightColor",
+        "pointLightDecay"
     ],
     
     "attributes" : [

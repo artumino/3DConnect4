@@ -6,7 +6,7 @@ var Scene = function()
     this.activeCamera = undefined;
     this.activeSkybox = undefined;
     this.activeDirectionalLight = undefined;
-    this.activePointLights = [];
+    this.activePointLight = undefined;
     this.destroyed = false;
 }
 
@@ -31,8 +31,8 @@ Scene.prototype.addEntity = function(entity)
             this.activeDirectionalLight = entity;
 
     if(entity instanceof PointLight &&
-        this.activePointLights.length < 4)
-        this.activePointLights.push(entity);
+        !this.activePointLight)
+            this.activePointLight = entity;
 }
 
 Scene.prototype.init = function()
