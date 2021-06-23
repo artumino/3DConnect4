@@ -61,14 +61,14 @@ Connect4Manager.prototype.reloadScene = function()
     this.gameBoard.clickable = true;
     this.gameBoard.move(0, -2, 0);
 
-    let skyBox = new Skybox("Skybox", Cubemap.getOrCreate("room"), Cubemap.getOrCreate("room_reflection"), 1, {
+    let skyBox = new Skybox("Skybox", Cubemap.getOrCreate("room"), Cubemap.getOrCreate("room_irradiance"), 0.35, {
         blurFactor: 2
     }, Shader.getShader("skybox"));
+    this.gameScene.addEntity(skyBox);
 
     this.gameScene.addEntity(cameraPivot);
     this.gameScene.addEntity(mainCamera);
     this.gameScene.addEntity(this.gameBoard);
-    this.gameScene.addEntity(skyBox);
 
     //Lights
     let directionalLight = new DirectionalLight("DirectionalLight", [ 0.5, 0.5, 0.5 ]);
@@ -76,8 +76,8 @@ Connect4Manager.prototype.reloadScene = function()
     directionalLight.setDirectionTo(this.gameBoard);
     this.gameScene.addEntity(directionalLight);
 
-    let pointLight = new PointLight("PointLight", [ 0, 0, 1 ], 20);
-    pointLight.setLocalPosition(10, 10, 0);
+    let pointLight = new PointLight("PointLight", [ 0, 0, 1 ], 1, 1);
+    pointLight.setLocalPosition(0, 50, 0);
     this.gameScene.addEntity(pointLight);
 
     //Pawn Drop Selectors

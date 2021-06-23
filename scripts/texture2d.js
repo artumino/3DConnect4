@@ -1,6 +1,7 @@
 var Texture = function(name)
 {
     this.handle = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.handle);
 
     this.image = new Image();
@@ -8,8 +9,8 @@ var Texture = function(name)
 
     var that = this;
     this.image.onload = function() {
+        gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, that.handle);
-              
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
