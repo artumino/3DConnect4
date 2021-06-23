@@ -70,15 +70,21 @@ Entity.prototype.predictMove = function(dx, dy, dz)
     this.localPosition[2] + dz ];
 };
 
+Entity.prototype.setBounds = function(bounds)
+{
+    this.bounds = bounds;
+    this.updateWorldBounds();
+}
+
 Entity.prototype.setLocalEulerRotation = function(rx, ry, rz)
 {
-    this.localRotation = Quaternion.fromEuler(utils.degToRad(rz), utils.degToRad(rx), utils.degToRad(ry), "ZXY");
+    this.localRotation = Quaternion.fromEuler(utils.degToRad(rz), utils.degToRad(rx), utils.degToRad(ry));
     this.updateWorldMatrix();
 };
 
 Entity.prototype.rotateEuler = function(rx, ry, rz)
 {
-    let rotation = Quaternion.fromEuler(utils.degToRad(rz), utils.degToRad(rx), utils.degToRad(ry), "ZXY");
+    let rotation = Quaternion.fromEuler(utils.degToRad(rz), utils.degToRad(rx), utils.degToRad(ry));
     this.rotate(rotation);
 };
 
@@ -103,7 +109,17 @@ Entity.prototype.updateWorldMatrix = function()
     this.childs.forEach(child => {
         child.updateWorldMatrix();
     });
+
+    this.updateWorldBounds();
 };
+
+Entity.prototype.updateWorldBounds = function()
+{
+    if(this.bounds)
+    {
+        this.bounds.updateWorldBounds(this.worldMatrix);
+    }
+}
 
 /*
         GAME LOGIC

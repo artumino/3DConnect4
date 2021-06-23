@@ -59,8 +59,9 @@ Connect4Manager.prototype.reloadScene = function()
         mainTexture: Texture.getOrCreate("WoodM1.jpg")
     }, meshLoader.base, Shader.getShader("ubershader"));
     this.gameBoard.clickable = true;
-    this.gameBoard.bounds = new BoundingBox([-6, -0.1, -6], [6, 0, 6]);
+    this.gameBoard.setBounds(new BoundingBox([-5.1, -0.1, -5.1], [5.1, 1.25, 5.1]));
     this.gameBoard.move(0, -2, 0);
+    //this.gameBoard.rotateEuler(0,30,20); //FIXME: Rotation break light raycast?
 
     let skyBox = new Skybox("Skybox", Cubemap.getOrCreate("room"), Cubemap.getOrCreate("room_irradiance"), 0.35, {
         blurFactor: 2
@@ -86,7 +87,7 @@ Connect4Manager.prototype.reloadScene = function()
             let collision = engine.input.mouseToWorld();
             if(collision)
             {
-                let localPosition = utils.multiplyMatrixVector(utils.invertMatrix(object.parent.worldMatrix), [collision.collisionPointCloser[0],
+                let localPosition = utils.multiplyMatrixVector(utils.invertMatrix(object.parent ? object.parent.worldMatrix : utils.identityMatrix()), [collision.collisionPointCloser[0],
                                                                                             collision.collisionPointCloser[1],
                                                                                             collision.collisionPointCloser[2],
                                                                                             1.0]);
