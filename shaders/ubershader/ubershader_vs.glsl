@@ -14,6 +14,6 @@ uniform mat4 matrix_W;
 void main() {
   uvFS = inUV0;
   normalVector = mat3(matrix_N) * inNormal0;
-  fs_pos = matrix_W * inPosition0;
+  fs_pos = (matrix_W * vec4(inPosition0, 1.0)).xyz;
   gl_Position = matrix_MVP * vec4(inPosition0, 1.0);
 }
