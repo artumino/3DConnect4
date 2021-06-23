@@ -46,6 +46,30 @@ Input.prototype.lateUpdate = function()
     this.selectedEntityId = decodedEntityId;
 }
 
+Input.prototype.mouseToWorld = function()
+{
+    //We calculate the normalised device coordinates from the pixel coordinates of the canvas
+    var normX = (2*this.mousePosition[0])/ gl.canvas.width - 1;
+    var normY = 1 - (2*this.mousePosition[1]) / gl.canvas.height;
+
+    //We need to go through the transformation pipeline in the inverse order so we invert the matrices
+    var projInv = utils.invertMatrix(engine.projectionMatrix);
+    var viewInv = utils.invertMatrix(engine.viewMatrix);
+
+    //Find the point (un)projected on the near plane, from clip space coords to eye coords
+    //z = -1 makes it so the point is on the near plane
+    //w = 1 is for the homogeneous coordinates in clip space
+    var pointEyeCoords = utils.multiplyMatrixVector(projInv, [normX, normY, -1, 1]);
+
+    //This finds the direction of the ray in eye space
+    //Formally, to calculate the direction you would do dir = point - eyePos but since we are in eye space eyePos = [0,0,0] 
+    //w = 0 is because this is not a point anymore but is considered as a direction
+    var rayEyeCoords = [pointEyeCoords[0], pointEyeCoords[1], pointEyeCoords[2], 0];
+    var rayDir = utils.multiplyMatrixVector(viewInv, rayEyeCoords);
+    var ray = new Ray(engine.currentScene.activeCamera.getWorldPosition(), utils.normalize(rayDir));
+    return engine.doRaycast(ray);
+}
+
 Input.prototype.onMouseDown = function(e)
 {
     this.isMouseDown = true;

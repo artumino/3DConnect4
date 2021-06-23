@@ -273,6 +273,30 @@ GameEngine.prototype.drawObject = function(sceneObject, matrixMVP, shaderOverrid
     }
 }
 
+GameEngine.prototype.doRaycast = function(ray)
+{
+    let tMin = undefined;
+    let collidedWith = undefined;
+    Object.values(this.currentScene.colliders).forEach(collider => {
+        let t = collider.bounds.intersect(ray);
+        if(t && (tMin == undefined || t < tMin))
+        {
+            tMin = t;
+            collidedWith = collider;
+        }
+    });
+
+    if(tMin != undefined)
+    {
+        return {
+            collider: collidedWith,
+            collisionPoint: ray.toPoint(tMin),
+            collisionPointCloser: ray.toPoint(tMin - 0.01) //Usefull for lights
+        };
+    }
+    return undefined;
+}
+
 GameEngine.prototype.loadScene = function(scene)
 {
     if(!scene.destroyed)

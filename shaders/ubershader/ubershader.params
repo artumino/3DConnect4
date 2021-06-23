@@ -1,6 +1,7 @@
 {
     "uniforms" : [
         "matrix_MVP",
+        "matrix_W",
         "matrix_N",
         "mainTexture",
         "ambientCubemap",

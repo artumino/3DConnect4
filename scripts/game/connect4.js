@@ -59,6 +59,7 @@ Connect4Manager.prototype.reloadScene = function()
         mainTexture: Texture.getOrCreate("WoodM1.jpg")
     }, meshLoader.base, Shader.getShader("ubershader"));
     this.gameBoard.clickable = true;
+    this.gameBoard.bounds = new BoundingBox([-6, -0.1, -6], [6, 0, 6]);
     this.gameBoard.move(0, -2, 0);
 
     let skyBox = new Skybox("Skybox", Cubemap.getOrCreate("room"), Cubemap.getOrCreate("room_irradiance"), 0.35, {
@@ -76,8 +77,27 @@ Connect4Manager.prototype.reloadScene = function()
     directionalLight.setDirectionTo(this.gameBoard);
     this.gameScene.addEntity(directionalLight);
 
-    let pointLight = new PointLight("PointLight", [ 0, 0, 1 ], 1, 1);
-    pointLight.setLocalPosition(0, 50, 0);
+    let pointLight = new PointLight("PointLight", [ 0.988, 0.5, 0 ], 1.5, 1);
+    pointLight.setLocalPosition(0, 1, 0);
+    pointLight.addComponent({
+        enabled: true,
+        update: function(object, deltaTime)
+        {
+            let collision = engine.input.mouseToWorld();
+            if(collision)
+            {
+                let localPosition = utils.multiplyMatrixVector(utils.invertMatrix(object.parent.worldMatrix), [collision.collisionPointCloser[0],
+                                                                                            collision.collisionPointCloser[1],
+                                                                                            collision.collisionPointCloser[2],
+                                                                                            1.0]);
+                object.setLocalPosition(localPosition[0] / localPosition[3], localPosition[1] / localPosition[3], localPosition[2] / localPosition[3]);
+            }
+            else
+            {
+                object.setLocalPosition(0, 100, 0);
+            }
+        }
+    });
     this.gameScene.addEntity(pointLight);
 
     //Pawn Drop Selectors

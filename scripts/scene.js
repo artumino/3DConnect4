@@ -1,6 +1,7 @@
 var Scene = function()
 {
     this.objects = {};
+    this.colliders = {};
     this.sceneRoot = new Entity("Root");
     this.objects[this.sceneRoot.id] = this.sceneRoot;
     this.activeCamera = undefined;
@@ -13,6 +14,7 @@ var Scene = function()
 Scene.prototype.addEntity = function(entity)
 {
     this.objects[entity.id] = entity;
+    if(entity.bounds) this.colliders[entity.id] = entity;
 
     //FIXME: Check for parents in other scenes
     if(!entity.parent)
@@ -33,6 +35,7 @@ Scene.prototype.addEntity = function(entity)
     if(entity instanceof PointLight &&
         !this.activePointLight)
             this.activePointLight = entity;
+
 }
 
 Scene.prototype.init = function()
